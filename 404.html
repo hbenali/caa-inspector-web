@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>404 · page not found · CAA checker</title>
+  <meta name="robots" content="noindex, follow">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: linear-gradient(145deg, #f0f5ff 0%, #e9eefa 100%);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      color: #1a2639;
+    }
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.75);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 2.5rem;
+      box-shadow: 0 25px 50px -12px rgba(0, 20, 60, 0.25), inset 0 1px 2px rgba(255,255,255,0.8);
+      width: 100%;
+      max-width: 700px;
+      padding: 3rem 2.5rem;
+      border: 1px solid rgba(255,255,255,0.5);
+      text-align: center;
+    }
+
+    .error-code {
+      font-size: 8rem;
+      font-weight: 700;
+      line-height: 1;
+      background: linear-gradient(135deg, #1e2f5e, #3a7bd5);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 0.5rem;
+      letter-spacing: -0.03em;
+    }
+
+    .divider {
+      width: 80px;
+      height: 4px;
+      background: linear-gradient(90deg, #3a7bd5, #a1c1ff);
+      border-radius: 2px;
+      margin: 1.5rem auto;
+    }
+
+    h1 {
+      font-size: 2rem;
+      font-weight: 600;
+      color: #1e3a6b;
+      margin-bottom: 1rem;
+    }
+
+    .message {
+      font-size: 1.2rem;
+      color: #3f4e77;
+      margin-bottom: 2.5rem;
+      line-height: 1.5;
+    }
+
+    .domain-preview {
+      background: rgba(58, 123, 213, 0.1);
+      border-radius: 60px;
+      padding: 0.8rem 1.8rem;
+      display: inline-block;
+      margin-bottom: 2rem;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 1.1rem;
+      color: #15305c;
+      border: 1px solid rgba(255,255,255,0.8);
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 1rem;
+    }
+
+    .primary-btn {
+      background: #1e3a6b;
+      border: none;
+      padding: 1rem 2.3rem;
+      border-radius: 60px;
+      font-weight: 600;
+      font-size: 1.05rem;
+      color: white;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 12px 22px -10px #1e3a6b;
+      transition: all 0.2s;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      text-decoration: none;
+    }
+
+    .primary-btn:hover {
+      background: #143157;
+      transform: scale(1.02);
+      box-shadow: 0 18px 28px -10px #122b4e;
+    }
+
+    .secondary-btn {
+      background: white;
+      color: #1e3a6b;
+      border: 2px solid #b8ceff;
+      padding: 1rem 2.3rem;
+      border-radius: 60px;
+      font-weight: 600;
+      font-size: 1.05rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s;
+      text-decoration: none;
+      box-shadow: 0 6px 12px -8px #1e3a6b70;
+    }
+
+    .secondary-btn:hover {
+      background: #ecf3ff;
+      border-color: #7fa2e0;
+      transform: scale(1.01);
+    }
+
+    .search-suggestion {
+      margin-top: 2.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px dashed #b6caf0;
+    }
+
+    .search-suggestion p {
+      color: #4b5f8a;
+      margin-bottom: 1rem;
+      font-size: 0.95rem;
+    }
+
+    .inline-search {
+      display: flex;
+      max-width: 450px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 60px;
+      border: 2px solid rgba(58, 123, 213, 0.2);
+      overflow: hidden;
+    }
+
+    .inline-search input {
+      flex: 1;
+      padding: 1rem 1.5rem;
+      border: none;
+      outline: none;
+      font-size: 1rem;
+      background: transparent;
+      color: #0b1f3b;
+    }
+
+    .inline-search button {
+      background: #1e3a6b;
+      border: none;
+      padding: 0 2rem;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .inline-search button:hover {
+      background: #143157;
+    }
+
+    footer {
+      margin-top: 2.5rem;
+      color: #57749e;
+      font-size: 0.9rem;
+    }
+
+    footer a {
+      color: #1e3f70;
+      text-decoration: none;
+      border-bottom: 1px dotted;
+    }
+
+    footer a:hover {
+      border-bottom: 2px solid;
+    }
+
+    .globe-icon {
+      font-size: 1.5rem;
+      margin-right: 0.3rem;
+      vertical-align: middle;
+    }
+  </style>
+</head>
+<body>
+  <div class="glass-card">
+    <div class="error-code">404</div>
+    <div class="divider"></div>
+    
+    <h1>Page not found</h1>
+    
+    <div class="message">
+      The page you're looking for doesn't exist or has been moved.
+    </div>
+
+    <div class="domain-preview">
+      <span class="globe-icon">🌐</span> caa.hbenali.ovh
+    </div>
+
+    <div class="action-buttons">
+      <a href="/" class="primary-btn">
+        <span>🏠</span> Go to homepage
+      </a>
+      <a href="/" class="secondary-btn">
+        <span>🔍</span> Check CAA records
+      </a>
+    </div>
+
+    <div class="search-suggestion">
+      <p>Try checking CAA records for a domain:</p>
+      <div class="inline-search">
+        <input type="text" id="domainInput" placeholder="example.com" value="hbenali.ovh">
+        <button id="searchBtn">Check</button>
+      </div>
+    </div>
+
+    <footer>
+      <a href="/">CAA record checker</a> · 
+      <a href="https://caa.hbenali.ovh/sitemap.xml">Sitemap</a> · 
+      <span>Lost? Let's get you back 🔍</span>
+    </footer>
+  </div>
+
+  <script>
+    // Add functionality to the inline search
+    document.getElementById('searchBtn').addEventListener('click', function() {
+      const domain = document.getElementById('domainInput').value.trim();
+      if (domain) {
+        // Redirect to homepage with the domain prefilled (via URL parameter)
+        window.location.href = '/?domain=' + encodeURIComponent(domain);
+      } else {
+        window.location.href = '/';
+      }
+    });
+
+    // Allow Enter key in input
+    document.getElementById('domainInput').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        document.getElementById('searchBtn').click();
+      }
+    });
+
+    // If the URL has a domain parameter, prefill it (useful if someone came from a broken link)
+    const urlParams = new URLSearchParams(window.location.search);
+    const domainParam = urlParams.get('domain');
+    if (domainParam) {
+      document.getElementById('domainInput').value = domainParam;
+    }
+  </script>
+</body>
+</html>
