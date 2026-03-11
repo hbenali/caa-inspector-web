@@ -4,13 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CAA · record inspector & builder</title>
-    <!-- SVG Favicon - works in all modern browsers -->
+  
+  <!-- SVG Favicon - works in all modern browsers -->
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="alternate icon" href="/favicon.ico"> <!-- Fallback for old browsers -->
   
   <!-- Optional: For better iOS/Android support -->
   <link rel="apple-touch-icon" href="/favicon.svg"> <!-- iOS will use SVG -->
   <meta name="theme-color" content="#1e3a6b">
+  
   <!-- modern clean CSS, system fonts, glassmorphism touch -->
   <style>
     * {
@@ -351,6 +353,59 @@
       font-family: 'SF Mono', monospace;
     }
 
+    /* New styles for the combobox/datalist */
+    .value-input-wrapper {
+      position: relative;
+      flex: 1 1 200px;
+    }
+
+    .value-input-wrapper input {
+      width: 100%;
+      padding: 0.8rem 1.2rem;
+      border: 2px solid #d5e2ff;
+      border-radius: 40px;
+      font-size: 0.95rem;
+      font-family: 'SF Mono', monospace;
+      background: white;
+    }
+
+    .value-input-wrapper input:focus {
+      border-color: #3a7bd5;
+      outline: none;
+    }
+
+    .suggestions-dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: white;
+      border: 2px solid #d5e2ff;
+      border-top: none;
+      border-radius: 0 0 20px 20px;
+      max-height: 200px;
+      overflow-y: auto;
+      z-index: 1000;
+      display: none;
+      box-shadow: 0 10px 20px -10px rgba(0,0,0,0.2);
+    }
+
+    .suggestions-dropdown div {
+      padding: 0.8rem 1.2rem;
+      cursor: pointer;
+      font-family: 'SF Mono', monospace;
+      font-size: 0.9rem;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    .suggestions-dropdown div:hover {
+      background: #e9f0ff;
+    }
+
+    .suggestions-dropdown div:last-child {
+      border-bottom: none;
+    }
+
     .tag-hint {
       font-size: 0.85rem;
       color: #5b729c;
@@ -479,7 +534,11 @@
       </div>
       <div class="gen-row">
         <span class="gen-label">Value</span>
-        <input type="text" id="genValue" class="gen-input" placeholder="letsencrypt.org, mailto:admin@example.com, etc." value="letsencrypt.org">
+        <div class="value-input-wrapper">
+          <input type="text" id="genValue" placeholder="Type or select a CA..." value="letsencrypt.org" autocomplete="off">
+          <div id="suggestions" class="suggestions-dropdown"></div>
+        </div>
+        <span class="tag-hint">common CAs shown</span>
       </div>
 
       <div class="generated-record-box" id="generatedPreview">
@@ -529,6 +588,7 @@
     const genFlag = document.getElementById('genFlag');
     const genTag = document.getElementById('genTag');
     const genValue = document.getElementById('genValue');
+    const suggestions = document.getElementById('suggestions');
     const generatedPreview = document.getElementById('generatedPreview');
     const addRecordBtn = document.getElementById('addRecordBtn');
     const loadExistingBtn = document.getElementById('loadExistingBtn');
@@ -539,6 +599,90 @@
     const clearAllRecords = document.getElementById('clearAllRecords');
     const bindOutput = document.getElementById('bindOutput');
 
+    // Common CAA values for autocomplete
+    const commonCAValues = [
+      'letsencrypt.org',
+      'digicert.com',
+      'comodoca.com',
+      'sectigo.com',
+      'globalsign.com',
+      'entrust.net',
+      'godaddy.com',
+      'ssl.com',
+      'thawte.com',
+      'geotrust.com',
+      'rapidssl.com',
+      'buypass.com',
+      'zerossl.com',
+      'ssl.com',
+      'certauth.ssl.com',
+      'amazontrust.com',
+      'awstrust.com',
+      'google.com',
+      'pki.goog',
+      'microsoft.com',
+      'mailto:security@example.com',
+      'http://example.com/report',
+      'https://example.com/report'
+    ];
+
+    // Filtered suggestions based on input
+    function filterSuggestions(input) {
+      if (!input) return commonCAValues;
+      const lowerInput = input.toLowerCase();
+      return commonCAValues.filter(value => 
+        value.toLowerCase().includes(lowerInput)
+      );
+    }
+
+    // Show suggestions dropdown
+    function showSuggestions() {
+      const input = genValue.value;
+      const filtered = filterSuggestions(input);
+      
+      if (filtered.length === 0) {
+        suggestions.style.display = 'none';
+        return;
+      }
+
+      suggestions.innerHTML = '';
+      filtered.forEach(value => {
+        const div = document.createElement('div');
+        div.textContent = value;
+        div.onclick = () => {
+          genValue.value = value;
+          suggestions.style.display = 'none';
+          updatePreview();
+        };
+        suggestions.appendChild(div);
+      });
+      
+      suggestions.style.display = 'block';
+    }
+
+    // Hide suggestions
+    function hideSuggestions() {
+      setTimeout(() => {
+        suggestions.style.display = 'none';
+      }, 200); // Delay to allow click on suggestion
+    }
+
+    // Event listeners for autocomplete
+    genValue.addEventListener('input', () => {
+      showSuggestions();
+      updatePreview();
+    });
+
+    genValue.addEventListener('focus', showSuggestions);
+    genValue.addEventListener('blur', hideSuggestions);
+
+    // Close suggestions when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!genValue.contains(e.target) && !suggestions.contains(e.target)) {
+        suggestions.style.display = 'none';
+      }
+    });
+
     // local array storing generated records (as raw strings, e.g. "0 issue \"letsencrypt.org\"")
     let generatedRecords = [];
 
@@ -546,15 +690,15 @@
     function updatePreview() {
       const flag = genFlag.value;
       const tag = genTag.value;
-      const value = genValue.value.trim() || '[value]';
-      // escape quotes if needed (preview only, but stored with quotes if user wants)
-      let displayValue = value;
-      if (!displayValue.startsWith('"') && (displayValue.includes(' ') || displayValue.includes('@'))) {
-        displayValue = `"${displayValue}"`;
-      } else if (!displayValue.startsWith('"') && !displayValue.match(/^[a-zA-Z0-9.-]+$/)) {
-        displayValue = `"${displayValue}"`;
+      let value = genValue.value.trim() || '[value]';
+      
+      // smart quoting for preview
+      if (!value.startsWith('"') && (value.includes(' ') || value.includes('@') || value.includes(':'))) {
+        value = `"${value}"`;
+      } else if (!value.startsWith('"') && !value.match(/^[a-zA-Z0-9.-]+$/)) {
+        value = `"${value}"`;
       }
-      generatedPreview.textContent = `${flag} ${tag} ${displayValue}`;
+      generatedPreview.textContent = `${flag} ${tag} ${value}`;
     }
 
     genFlag.addEventListener('change', updatePreview);
