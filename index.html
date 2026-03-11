@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CAA · record inspector & builder</title>
+  <!-- modern clean CSS, system fonts, glassmorphism touch -->
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: linear-gradient(145deg, #f0f5ff 0%, #e9eefa 100%);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      color: #1a2639;
+    }
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.75);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 2.5rem;
+      box-shadow: 0 25px 50px -12px rgba(0, 20, 60, 0.25), inset 0 1px 2px rgba(255,255,255,0.8);
+      width: 100%;
+      max-width: 900px;
+      padding: 2.5rem 2rem;
+      border: 1px solid rgba(255,255,255,0.5);
+      transition: box-shadow 0.2s;
+    }
+
+    h1 {
+      font-size: 2.2rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #1e2f5e, #2c3f7c);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 0.2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .subhead {
+      font-size: 1rem;
+      font-weight: 400;
+      color: #3f4e77;
+      margin-bottom: 1.8rem;
+      border-left: 3px solid #3a7bd5;
+      padding-left: 1rem;
+      background: rgba(58, 123, 213, 0.06);
+      border-radius: 0 8px 8px 0;
+    }
+
+    .subhead code {
+      background: #1e2f5e10;
+      padding: 0.2rem 0.5rem;
+      border-radius: 30px;
+      font-weight: 500;
+      color: #1e3c72;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-bottom: 2rem;
+    }
+
+    label {
+      font-weight: 550;
+      font-size: 0.95rem;
+      letter-spacing: 0.02em;
+      color: #1e3a6b;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    label i {
+      font-style: normal;
+      background: #d9e4ff;
+      padding: 2px 8px;
+      border-radius: 30px;
+      font-size: 0.8rem;
+      color: #15305c;
+    }
+
+    .domain-input-wrapper {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    #domainInput {
+      flex: 1 1 260px;
+      padding: 1rem 1.4rem;
+      font-size: 1.1rem;
+      background: white;
+      border: 2px solid rgba(58, 123, 213, 0.2);
+      border-radius: 60px;
+      outline: none;
+      font-weight: 450;
+      color: #0b1f3b;
+      transition: 0.15s;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.02);
+    }
+
+    #domainInput:focus {
+      border-color: #3a7bd5;
+      box-shadow: 0 8px 18px -8px rgba(58, 123, 213, 0.3);
+    }
+
+    #domainInput::placeholder {
+      color: #9babc7;
+      font-weight: 350;
+      font-size: 1rem;
+    }
+
+    button {
+      background: #1e3a6b;
+      border: none;
+      padding: 1rem 2.3rem;
+      border-radius: 60px;
+      font-weight: 600;
+      font-size: 1.05rem;
+      color: white;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 12px 22px -10px #1e3a6b;
+      transition: all 0.2s;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      letter-spacing: 0.3px;
+      white-space: nowrap;
+    }
+
+    button:hover {
+      background: #143157;
+      transform: scale(1.02);
+      box-shadow: 0 18px 28px -10px #122b4e;
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      pointer-events: none;
+      filter: grayscale(0.3);
+    }
+
+    .loader {
+      display: inline-block;
+      width: 1.1rem;
+      height: 1.1rem;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top: 2px solid white;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-right: 6px;
+    }
+
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+    .result-area {
+      background: rgba(255,255,255,0.6);
+      backdrop-filter: blur(4px);
+      border-radius: 2rem;
+      padding: 1.8rem 1.8rem 1.8rem 2rem;
+      border: 1px solid white;
+      margin-top: 1rem;
+      box-shadow: inset 0 2px 4px rgba(255,255,255,0.8), 0 8px 14px -12px #1e2f5e;
+    }
+
+    .result-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .result-header h2 {
+      font-size: 1.3rem;
+      font-weight: 550;
+      color: #1b2c51;
+    }
+
+    .badge-domain {
+      background: #d2e0ff;
+      border-radius: 40px;
+      padding: 0.3rem 1rem;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-weight: 550;
+      font-size: 1rem;
+      color: #11223d;
+      word-break: break-all;
+      border: 1px solid white;
+    }
+
+    .record-list {
+      list-style: none;
+      margin: 1.2rem 0 0.8rem 0;
+    }
+
+    .record-item {
+      background: white;
+      border-radius: 50px;
+      padding: 0.9rem 1.5rem;
+      margin-bottom: 10px;
+      font-family: 'SF Mono', 'Fira Code', Menlo, monospace;
+      font-size: 1rem;
+      box-shadow: 0 4px 10px -6px #1e3a6b30;
+      border-left: 6px solid #3a7bd5;
+      word-break: break-word;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 0.6rem;
+      transition: 0.1s;
+    }
+
+    .record-item:hover {
+      border-left-width: 10px;
+      padding-left: 1.3rem;
+    }
+
+    .flag-tag {
+      background: #edf3ff;
+      color: #153e7a;
+      padding: 0.2rem 1rem 0.2rem 0.8rem;
+      border-radius: 40px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .record-value {
+      font-weight: 450;
+      color: #0b1f3b;
+      word-break: break-word;
+      flex: 1;
+    }
+
+    .empty-state {
+      background: #f8fbff;
+      padding: 2rem 2rem;
+      border-radius: 2rem;
+      color: #384e77;
+      font-weight: 400;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.6rem;
+      border: 2px dashed #bbd2ff;
+      text-align: center;
+    }
+
+    .empty-state span {
+      font-size: 2.5rem;
+    }
+
+    .error-message {
+      background: #ffeae9;
+      border-left: 6px solid #d14545;
+      padding: 1.3rem 1.8rem;
+      border-radius: 40px;
+      color: #a13030;
+      font-weight: 480;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      box-shadow: 0 6px 12px -6px #d1454530;
+    }
+
+    /* generator section */
+    .generator-section {
+      margin-top: 2.2rem;
+      padding-top: 1.2rem;
+      border-top: 2px dashed #b6caf0;
+    }
+
+    .section-title {
+      font-weight: 600;
+      font-size: 1.2rem;
+      color: #1b2c51;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .generator-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+    }
+
+    .gen-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .gen-label {
+      min-width: 100px;
+      font-weight: 550;
+      color: #1e3f70;
+    }
+
+    select, .gen-input {
+      background: white;
+      border: 2px solid #d5e2ff;
+      padding: 0.8rem 1.2rem;
+      border-radius: 40px;
+      font-size: 0.95rem;
+      color: #121f3a;
+      outline: none;
+      flex: 1 1 200px;
+    }
+
+    select:focus, .gen-input:focus {
+      border-color: #3a7bd5;
+    }
+
+    .gen-input {
+      font-family: 'SF Mono', monospace;
+    }
+
+    .tag-hint {
+      font-size: 0.85rem;
+      color: #5b729c;
+    }
+
+    .generated-record-box {
+      background: #e2edff;
+      border-radius: 40px;
+      padding: 1rem 1.8rem;
+      font-family: 'SF Mono', monospace;
+      font-size: 1rem;
+      word-break: break-all;
+      border: 2px solid white;
+      margin: 0.5rem 0 1rem;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-top: 0.5rem;
+    }
+
+    .secondary-btn {
+      background: white;
+      color: #1e3a6b;
+      border: 2px solid #b8ceff;
+      box-shadow: 0 6px 12px -8px #1e3a6b70;
+    }
+
+    .secondary-btn:hover {
+      background: #ecf3ff;
+      border-color: #7fa2e0;
+    }
+
+    .note {
+      margin-top: 2rem;
+      font-size: 0.85rem;
+      color: #4b5f8a;
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      flex-wrap: wrap;
+      border-top: 1px solid #cdddfa;
+      padding-top: 1.5rem;
+    }
+
+    .note a {
+      color: #1e3f70;
+      font-weight: 550;
+      text-decoration: none;
+      border-bottom: 1px dotted;
+    }
+
+    .note a:hover { border-bottom: 2px solid; }
+
+    footer {
+      margin-top: 2.2rem;
+      text-align: center;
+      font-size: 0.9rem;
+      color: #57749e;
+    }
+  </style>
+</head>
+<body>
+<div class="glass-card">
+  <h1>
+    <span>🔍 CAA · inspect & build</span>
+  </h1>
+  <div class="subhead">
+    Check existing <strong>CAA records</strong> or generate new ones — load existing to edit
+  </div>
+
+  <!-- main input group -->
+  <div class="input-group">
+    <label>
+      <span>Domain name</span>
+      <i>example.com</i>
+    </label>
+    <div class="domain-input-wrapper">
+      <input type="text" id="domainInput" placeholder="e.g. example.com" value="example.com" spellcheck="false" autocomplete="off">
+      <button id="checkBtn">
+        <span id="btnText">Check CAA</span>
+        <span id="btnLoader" style="display: none;"></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- dynamic result card (lookup) -->
+  <div class="result-area" id="resultContainer">
+    <!-- default info / placeholder (will be replaced by JS) -->
+    <div class="empty-state" id="placeholderState">
+      <span>📋</span>
+      <div>Enter a domain and click “Check CAA”<br> <span style="font-size:0.9rem;">CAA records show which CAs are allowed to issue certificates.</span></div>
+    </div>
+
+    <!-- these sections are dynamically filled/ toggled by javascript -->
+    <div id="recordsContainer" style="display: none;"></div>
+    <div id="errorContainer" style="display: none;"></div>
+  </div>
+
+  <!-- CAA GENERATOR SECTION (with load existing) -->
+  <div class="generator-section">
+    <div class="section-title">
+      <span>🛠️ CAA record generator</span>
+      <span style="font-size:0.85rem; background:#d9e6ff; padding:0.2rem 1rem; border-radius:30px;">load & edit</span>
+    </div>
+    <div class="generator-grid">
+      <!-- flag + tag + value -->
+      <div class="gen-row">
+        <span class="gen-label">Flag</span>
+        <select id="genFlag">
+          <option value="0">0 (critical)</option>
+          <option value="128">128 (non-critical)</option>
+          <option value="255">255 (reserved)</option>
+        </select>
+        <span class="tag-hint">usually 0</span>
+      </div>
+      <div class="gen-row">
+        <span class="gen-label">Tag</span>
+        <select id="genTag">
+          <option value="issue">issue</option>
+          <option value="issuewild">issuewild</option>
+          <option value="iodef">iodef</option>
+        </select>
+      </div>
+      <div class="gen-row">
+        <span class="gen-label">Value</span>
+        <input type="text" id="genValue" class="gen-input" placeholder="letsencrypt.org, mailto:admin@example.com, etc." value="letsencrypt.org">
+      </div>
+
+      <div class="generated-record-box" id="generatedPreview">
+        0 issue "letsencrypt.org"
+      </div>
+
+      <div class="action-buttons">
+        <button id="addRecordBtn" class="secondary-btn" style="background:#e9f0ff; color:#0f2c55;">➕ Add to list</button>
+        <button id="loadExistingBtn" class="secondary-btn" style="background:#ddeaff;">📂 Load existing from lookup</button>
+        <button id="clearGenBtn" class="secondary-btn">🗑️ Reset</button>
+      </div>
+
+      <!-- accumulated records for generation -->
+      <div style="margin-top: 0.8rem;">
+        <span style="font-weight:550; color:#1a3b6e;">Records to publish: </span>
+        <span id="recordCount">0</span> (below)
+      </div>
+      <ul id="generatedList" style="list-style:none; margin-top:0.8rem;">
+        <!-- dynamic list items will appear here -->
+      </ul>
+      <div style="display:flex; gap:1rem; flex-wrap:wrap; margin-top:1rem;">
+        <button id="generateBindText" style="background: #2e4a7c;">📄 Show as BIND lines</button>
+        <button id="clearAllRecords" class="secondary-btn">🗑️ Clear all</button>
+      </div>
+      <div id="bindOutput" style="background:#f2f7ff; border-radius:30px; padding:1rem 1.5rem; font-family: monospace; white-space:pre-wrap; margin-top:1rem; border:2px solid white; display:none;"></div>
+    </div>
+  </div>
+
+  <footer>
+    ⚡ using <strong>Google DNS over HTTPS</strong> · build CAA records ready for zone file
+  </footer>
+</div>
+
+<script>
+  (function() {
+    // ----- DOM elements (lookup) -----
+    const domainInput = document.getElementById('domainInput');
+    const checkBtn = document.getElementById('checkBtn');
+    const btnText = document.getElementById('btnText');
+    const btnLoader = document.getElementById('btnLoader');
+    const resultContainer = document.getElementById('resultContainer');
+    const placeholderState = document.getElementById('placeholderState');
+    const recordsContainer = document.getElementById('recordsContainer');
+    const errorContainer = document.getElementById('errorContainer');
+
+    // generator elements
+    const genFlag = document.getElementById('genFlag');
+    const genTag = document.getElementById('genTag');
+    const genValue = document.getElementById('genValue');
+    const generatedPreview = document.getElementById('generatedPreview');
+    const addRecordBtn = document.getElementById('addRecordBtn');
+    const loadExistingBtn = document.getElementById('loadExistingBtn');
+    const clearGenBtn = document.getElementById('clearGenBtn');
+    const generatedList = document.getElementById('generatedList');
+    const recordCountSpan = document.getElementById('recordCount');
+    const generateBindText = document.getElementById('generateBindText');
+    const clearAllRecords = document.getElementById('clearAllRecords');
+    const bindOutput = document.getElementById('bindOutput');
+
+    // local array storing generated records (as raw strings, e.g. "0 issue \"letsencrypt.org\"")
+    let generatedRecords = [];
+
+    // helper to update preview based on inputs
+    function updatePreview() {
+      const flag = genFlag.value;
+      const tag = genTag.value;
+      const value = genValue.value.trim() || '[value]';
+      // escape quotes if needed (preview only, but stored with quotes if user wants)
+      let displayValue = value;
+      if (!displayValue.startsWith('"') && (displayValue.includes(' ') || displayValue.includes('@'))) {
+        displayValue = `"${displayValue}"`;
+      } else if (!displayValue.startsWith('"') && !displayValue.match(/^[a-zA-Z0-9.-]+$/)) {
+        displayValue = `"${displayValue}"`;
+      }
+      generatedPreview.textContent = `${flag} ${tag} ${displayValue}`;
+    }
+
+    genFlag.addEventListener('change', updatePreview);
+    genTag.addEventListener('change', updatePreview);
+    genValue.addEventListener('input', updatePreview);
+    updatePreview();
+
+    // render the list of generated records
+    function renderGeneratedList() {
+      if (generatedRecords.length === 0) {
+        generatedList.innerHTML = '<li style="background:#f2f7ff; border-radius:40px; padding:1rem; color:#5f73a1;">➕ No CAA records added yet. Use the form above.</li>';
+        recordCountSpan.textContent = '0';
+        return;
+      }
+      let html = '';
+      generatedRecords.forEach((rec, idx) => {
+        const escaped = rec.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        html += `<li style="background:white; border-radius:40px; padding:0.8rem 1.5rem; margin-bottom:8px; display:flex; align-items:center; gap:10px; border-left:6px solid #5d8bda;">
+          <span style="flex:1; font-family:monospace;">${escaped}</span>
+          <button class="remove-record" data-index="${idx}" style="background:transparent; border:none; font-size:1.3rem; cursor:pointer; color:#b33; padding:0 6px;">&times;</button>
+        </li>`;
+      });
+      generatedList.innerHTML = html;
+      recordCountSpan.textContent = generatedRecords.length;
+
+      // attach remove events
+      document.querySelectorAll('.remove-record').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const index = e.target.getAttribute('data-index');
+          if (index !== null) {
+            generatedRecords.splice(parseInt(index), 1);
+            renderGeneratedList();
+          }
+        });
+      });
+    }
+
+    // add current preview as record
+    addRecordBtn.addEventListener('click', () => {
+      const flag = genFlag.value;
+      const tag = genTag.value;
+      let value = genValue.value.trim();
+      if (!value) {
+        alert('Please enter a value (e.g., ca.example.com)');
+        return;
+      }
+      // smart quoting: if contains spaces or special chars, wrap in quotes (but not double-quoted)
+      if (!value.startsWith('"') && (value.includes(' ') || value.includes('@') || value.includes(':'))) {
+        value = `"${value}"`;
+      } else if (!value.startsWith('"') && !/^[a-zA-Z0-9.-]+$/.test(value)) {
+        value = `"${value}"`;
+      }
+      const record = `${flag} ${tag} ${value}`;
+      generatedRecords.push(record);
+      renderGeneratedList();
+      bindOutput.style.display = 'none';
+    });
+
+    // clear all generated
+    clearAllRecords.addEventListener('click', () => {
+      generatedRecords = [];
+      renderGeneratedList();
+      bindOutput.style.display = 'none';
+    });
+
+    // reset generator fields to defaults
+    clearGenBtn.addEventListener('click', () => {
+      genFlag.value = '0';
+      genTag.value = 'issue';
+      genValue.value = 'letsencrypt.org';
+      updatePreview();
+    });
+
+    // load existing from last lookup (from recordsContainer if visible)
+    loadExistingBtn.addEventListener('click', () => {
+      // try to fetch records currently displayed in recordsContainer (parsed from last lookup)
+      if (recordsContainer.style.display !== 'block') {
+        alert('No existing records loaded. Please perform a lookup first.');
+        return;
+      }
+      // we stored them in a data attribute or we re-parse? easier: we keep lastRawRecords from last successful query
+      if (lastRawRecords && lastRawRecords.length > 0) {
+        // replace generatedRecords? we will append? we'll ask: confirm replace or append? we do replace for simplicity.
+        if (generatedRecords.length > 0 && !confirm('Replace current generated records with the ones from lookup?')) {
+          return;
+        }
+        generatedRecords = [...lastRawRecords]; // these are raw strings like "0 issue \"letsencrypt.org\""
+        renderGeneratedList();
+        bindOutput.style.display = 'none';
+      } else {
+        alert('No CAA records found in last lookup (or they were empty).');
+      }
+    });
+
+    // generate BIND lines
+    generateBindText.addEventListener('click', () => {
+      if (generatedRecords.length === 0) {
+        bindOutput.textContent = '; no CAA records to display';
+        bindOutput.style.display = 'block';
+        return;
+      }
+      let lines = '; CAA records (BIND format)\n';
+      const domain = domainInput.value.trim() || 'example.com';
+      generatedRecords.forEach(rec => {
+        lines += `${domain}. IN CAA ${rec}\n`;
+      });
+      bindOutput.textContent = lines;
+      bindOutput.style.display = 'block';
+    });
+
+    // ----- lookup logic (same as before, with small tweak to store lastRawRecords) -----
+    let lastRawRecords = null;  // stores raw record strings for generator loading
+
+    function setActiveView(view) {
+      placeholderState.style.display = 'none';
+      recordsContainer.style.display = 'none';
+      errorContainer.style.display = 'none';
+      if (view === 'placeholder') placeholderState.style.display = 'flex';
+      else if (view === 'records') recordsContainer.style.display = 'block';
+      else if (view === 'error') errorContainer.style.display = 'block';
+    }
+    setActiveView('placeholder');
+
+    async function queryCAA(domain) {
+      let clean = domain.trim().replace(/\.+$/, '');
+      if (clean === '') throw new Error('Empty domain name');
+      const url = `https://dns.google/resolve?name=${encodeURIComponent(clean)}&type=CAA`;
+      const response = await fetch(url);
+      if (!response.ok) throw new Error(`DNS query failed (HTTP ${response.status})`);
+      const data = await response.json();
+      if (data.Status === 3) throw new Error(`Domain "${clean}" does not exist (NXDOMAIN)`);
+      else if (data.Status !== 0) {
+        const reason = data.Comment || `DNS error code ${data.Status}`;
+        throw new Error(`DNS lookup error: ${reason}`);
+      }
+      const answers = data.Answer || [];
+      const caaRecords = answers.filter(r => r.type === 257);
+      return {
+        domain: clean,
+        records: caaRecords.map(r => r.data.replace(/^CAA\s+/i, '').trim()),
+        raw: caaRecords
+      };
+    }
+
+    function renderRecords(domain, records) {
+      if (!records || records.length === 0) {
+        recordsContainer.innerHTML = `
+          <div class="empty-state" style="background:#f0f7ff;">
+            <span>🔓</span>
+            <div><strong style="font-size:1.2rem;">No CAA records found</strong></div>
+            <div style="margin-top:0.5rem;">Domain <code>${escapeHtml(domain)}</code> has no CAA policy.<br>Any CA may issue certificates.</div>
+          </div>
+        `;
+        return;
+      }
+      let itemsHtml = '';
+      for (let rec of records) {
+        const escaped = escapeHtml(rec);
+        const parts = rec.match(/^(\d+)\s+(issue|issuewild|iodef)\s+(.*)$/i);
+        let flagPart = '', tagPart = '', valuePart = rec;
+        if (parts) {
+          flagPart = parts[1];
+          tagPart = parts[2];
+          valuePart = parts[3].replace(/^"|"$/g, '');
+        }
+        if (parts) {
+          itemsHtml += `
+            <li class="record-item">
+              <span class="flag-tag">⚑ ${flagPart}</span>
+              <span class="flag-tag" style="background:#d6e6ff;">🏷 ${tagPart}</span>
+              <span class="record-value">${escapeHtml(valuePart)}</span>
+            </li>
+          `;
+        } else {
+          itemsHtml += `<li class="record-item"><span class="record-value">${escaped}</span></li>`;
+        }
+      }
+      recordsContainer.innerHTML = `
+        <div class="result-header">
+          <h2>📌 CAA records for</h2>
+          <span class="badge-domain">${escapeHtml(domain)}</span>
+        </div>
+        <ul class="record-list">${itemsHtml}</ul>
+        <div style="margin-top: 0.8rem; font-size:0.9rem; color:#4263a5;">${records.length} record(s) found</div>
+      `;
+    }
+
+    function renderError(domain, errorMessage) {
+      errorContainer.innerHTML = `
+        <div class="error-message">
+          <span style="font-size:2rem;">⚠️</span>
+          <div style="flex:1;"><strong>Error checking ${escapeHtml(domain)}</strong><br>${escapeHtml(errorMessage)}</div>
+        </div>
+      `;
+    }
+
+    function escapeHtml(unsafe) {
+      return unsafe.replace(/[&<>"]/g, function(m) {
+        if(m === '&') return '&amp;'; if(m === '<') return '&lt;'; if(m === '>') return '&gt;'; if(m === '"') return '&quot;';
+        return m;
+      });
+    }
+
+    function setLoading(isLoading) {
+      checkBtn.disabled = isLoading;
+      btnText.textContent = isLoading ? 'Checking' : 'Check CAA';
+      btnLoader.style.display = isLoading ? 'inline-block' : 'none';
+      btnLoader.className = isLoading ? 'loader' : '';
+    }
+
+    async function performLookup() {
+      const domain = domainInput.value;
+      if (!domain.trim()) {
+        setActiveView('error');
+        renderError('', 'Please enter a domain name');
+        return;
+      }
+      setLoading(true);
+      try {
+        const result = await queryCAA(domain);
+        // store raw record strings for generator (using result.records)
+        lastRawRecords = result.records;  // array like ["0 issue \"letsencrypt.org\""]
+        renderRecords(result.domain, result.records);
+        setActiveView('records');
+      } catch (err) {
+        lastRawRecords = null;
+        renderError(domain, err.message || 'Unknown error');
+        setActiveView('error');
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    checkBtn.addEventListener('click', performLookup);
+    domainInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') performLookup(); });
+
+    // initial placeholder
+    renderGeneratedList(); // empty list
+  })();
+</script>
+</body>
+</html>
