@@ -784,6 +784,23 @@
     checkBtn.addEventListener('click', performLookup);
     domainInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') performLookup(); });
 
+    // ===== NEW CODE: Handle URL parameter on page load =====
+    function handleUrlParameter() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const domainParam = urlParams.get('domain');
+      
+      if (domainParam) {
+        // Set the input field value
+        domainInput.value = domainParam;
+        // Automatically trigger the CAA lookup
+        performLookup();
+      }
+    }
+
+    // Call the function when the page loads
+    window.addEventListener('load', handleUrlParameter);
+    // ===== END OF NEW CODE =====
+
     // initial placeholder
     renderGeneratedList(); // empty list
   })();
