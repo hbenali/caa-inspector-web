@@ -3,16 +3,69 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CAA · record inspector & builder</title>
-  
-  <!-- SVG Favicon - works in all modern browsers -->
+  <title>CAA Checker — DNS CAA Record Inspector & Generator</title>
+  <meta name="description" content="Free CAA record checker and generator. Instantly inspect any domain's DNS CAA records to see which certificate authorities may issue for it, and build new issue/issuewild/iodef records ready for your zone file.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://caa.hbenali.ovh/">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="CAA Checker — DNS CAA Record Inspector & Generator">
+  <meta property="og:description" content="Inspect any domain's DNS CAA records and build new issue/issuewild/iodef records ready for your zone file.">
+  <meta property="og:url" content="https://caa.hbenali.ovh/">
+  <meta property="og:site_name" content="CAA Checker">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:image" content="https://caa.hbenali.ovh/favicon.svg">
+  <meta property="og:image:type" content="image/svg+xml">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="CAA Checker — DNS CAA Record Inspector & Generator">
+  <meta name="twitter:description" content="Inspect any domain's DNS CAA records and build new issue/issuewild/iodef records ready for your zone file.">
+  <meta name="twitter:image" content="https://caa.hbenali.ovh/favicon.svg">
+
+  <!-- SVG Favicon -->
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-  <link rel="alternate icon" href="/favicon.ico"> <!-- Fallback for old browsers -->
-  
-  <!-- Optional: For better iOS/Android support -->
-  <link rel="apple-touch-icon" href="/favicon.svg"> <!-- iOS will use SVG -->
+  <link rel="alternate icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <meta name="theme-color" content="#1e3a6b">
-  
+
+  <!-- dns.google is only hit on-demand after a lookup -->
+  <link rel="dns-prefetch" href="https://dns.google">
+
+  <!-- Structured data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "url": "https://caa.hbenali.ovh/",
+        "name": "CAA Checker",
+        "description": "Free CAA record checker and generator for inspecting DNS Certification Authority Authorization records.",
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "https://caa.hbenali.ovh/?domain={search_term_string}",
+          "query-input": "required name=search_term_string"
+        }
+      },
+      {
+        "@type": "WebApplication",
+        "name": "CAA Checker",
+        "url": "https://caa.hbenali.ovh/",
+        "applicationCategory": "UtilitiesApplication",
+        "operatingSystem": "Any",
+        "description": "Check any domain's CAA DNS records and generate new issue/issuewild/iodef records for a zone file.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        }
+      }
+    ]
+  }
+  </script>
+
   <!-- modern clean CSS, system fonts, glassmorphism touch -->
   <style>
     * {
@@ -21,35 +74,145 @@
       box-sizing: border-box;
     }
 
+    :root {
+      --bg-1: #f0f5ff;
+      --bg-2: #e9eefa;
+      --text: #1a2639;
+      --text-muted: #3f4e77;
+      --text-soft: #5b729c;
+      --card-bg: rgba(255, 255, 255, 0.75);
+      --card-border: rgba(255, 255, 255, 0.5);
+      --accent: #3a7bd5;
+      --accent-dark: #1e3a6b;
+      --accent-darker: #143157;
+      --input-bg: #ffffff;
+      --input-border: rgba(58, 123, 213, 0.2);
+      --select-border: #d5e2ff;
+      --placeholder: #9babc7;
+      --chip-bg: #d2e0ff;
+      --chip-bg2: #edf3ff;
+      --chip-text: #15305c;
+      --result-bg: rgba(255, 255, 255, 0.6);
+      --empty-bg: #f8fbff;
+      --empty-border: #bbd2ff;
+      --invalid-bg: #ffeae9;
+      --invalid-text: #a13030;
+      --invalid-border: #d14545;
+      --shadow-color: rgba(0, 20, 60, 0.25);
+      --shadow-soft: rgba(30, 58, 107, 0.19);
+      --record-border: #5d8bda;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --bg-1: #0f172a;
+        --bg-2: #1c2c40;
+        --text: #e6edf5;
+        --text-muted: #93aec4;
+        --text-soft: #7c96ad;
+        --card-bg: rgba(20, 30, 46, 0.78);
+        --card-border: rgba(255, 255, 255, 0.08);
+        --accent: #3498db;
+        --accent-dark: #5dade2;
+        --accent-darker: #6cc0f0;
+        --input-bg: #131f30;
+        --input-border: rgba(52, 152, 219, 0.25);
+        --select-border: #2d4257;
+        --placeholder: #4a6478;
+        --chip-bg: #1b2f45;
+        --chip-bg2: #16283b;
+        --chip-text: #bcdcf7;
+        --result-bg: rgba(19, 31, 48, 0.6);
+        --empty-bg: #131f30;
+        --empty-border: #2d4257;
+        --invalid-bg: #3a1414;
+        --invalid-text: #ff8a8a;
+        --invalid-border: #b5453a;
+        --shadow-color: rgba(0, 0, 0, 0.45);
+        --shadow-soft: rgba(0, 0, 0, 0.35);
+        --record-border: #5dade2;
+      }
+    }
+
+    :root[data-theme="dark"] {
+      --bg-1: #0f172a;
+      --bg-2: #1c2c40;
+      --text: #e6edf5;
+      --text-muted: #93aec4;
+      --text-soft: #7c96ad;
+      --card-bg: rgba(20, 30, 46, 0.78);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --accent: #3498db;
+      --accent-dark: #5dade2;
+      --accent-darker: #6cc0f0;
+      --input-bg: #131f30;
+      --input-border: rgba(52, 152, 219, 0.25);
+      --select-border: #2d4257;
+      --placeholder: #4a6478;
+      --chip-bg: #1b2f45;
+      --chip-bg2: #16283b;
+      --chip-text: #bcdcf7;
+      --result-bg: rgba(19, 31, 48, 0.6);
+      --empty-bg: #131f30;
+      --empty-border: #2d4257;
+      --invalid-bg: #3a1414;
+      --invalid-text: #ff8a8a;
+      --invalid-border: #b5453a;
+      --shadow-color: rgba(0, 0, 0, 0.45);
+      --shadow-soft: rgba(0, 0, 0, 0.35);
+      --record-border: #5dade2;
+    }
+
     body {
-      background: linear-gradient(145deg, #f0f5ff 0%, #e9eefa 100%);
+      background: linear-gradient(145deg, var(--bg-1) 0%, var(--bg-2) 100%);
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 1.5rem;
-      color: #1a2639;
+      color: var(--text);
+      transition: background 0.3s, color 0.3s;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
     }
 
     .glass-card {
-      background: rgba(255, 255, 255, 0.75);
+      background: var(--card-bg);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
       border-radius: 2.5rem;
-      box-shadow: 0 25px 50px -12px rgba(0, 20, 60, 0.25), inset 0 1px 2px rgba(255,255,255,0.8);
+      box-shadow: 0 25px 50px -12px var(--shadow-color), inset 0 1px 2px rgba(255, 255, 255, 0.1);
       width: 100%;
       max-width: 900px;
       padding: 2.5rem 2rem;
-      border: 1px solid rgba(255,255,255,0.5);
-      transition: box-shadow 0.2s;
+      border: 1px solid var(--card-border);
+      transition: box-shadow 0.2s, background 0.3s, border 0.3s;
+    }
+
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
     }
 
     h1 {
       font-size: 2.2rem;
       font-weight: 600;
       letter-spacing: -0.02em;
-      background: linear-gradient(135deg, #1e2f5e, #2c3f7c);
+      background: linear-gradient(135deg, var(--accent-dark), var(--accent));
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
@@ -59,23 +222,46 @@
       gap: 0.4rem;
     }
 
+    .theme-toggle {
+      background: var(--input-bg);
+      border: 1px solid var(--select-border);
+      width: 2.7rem;
+      height: 2.7rem;
+      min-width: 2.7rem;
+      border-radius: 50%;
+      font-size: 1.2rem;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: none;
+      color: var(--text);
+    }
+
+    .theme-toggle:hover {
+      background: var(--input-bg);
+      transform: scale(1.08);
+      box-shadow: 0 8px 16px -8px var(--shadow-color);
+    }
+
     .subhead {
       font-size: 1rem;
       font-weight: 400;
-      color: #3f4e77;
+      color: var(--text-muted);
       margin-bottom: 1.8rem;
-      border-left: 3px solid #3a7bd5;
+      border-left: 3px solid var(--accent);
       padding-left: 1rem;
       background: rgba(58, 123, 213, 0.06);
       border-radius: 0 8px 8px 0;
     }
 
     .subhead code {
-      background: #1e2f5e10;
+      background: rgba(30, 47, 94, 0.08);
       padding: 0.2rem 0.5rem;
       border-radius: 30px;
       font-weight: 500;
-      color: #1e3c72;
+      color: var(--accent-dark);
     }
 
     .input-group {
@@ -89,7 +275,7 @@
       font-weight: 550;
       font-size: 0.95rem;
       letter-spacing: 0.02em;
-      color: #1e3a6b;
+      color: var(--accent-dark);
       display: flex;
       align-items: center;
       gap: 6px;
@@ -97,11 +283,11 @@
 
     label i {
       font-style: normal;
-      background: #d9e4ff;
+      background: var(--chip-bg);
       padding: 2px 8px;
       border-radius: 30px;
       font-size: 0.8rem;
-      color: #15305c;
+      color: var(--chip-text);
     }
 
     .domain-input-wrapper {
@@ -115,29 +301,29 @@
       flex: 1 1 260px;
       padding: 1rem 1.4rem;
       font-size: 1.1rem;
-      background: white;
-      border: 2px solid rgba(58, 123, 213, 0.2);
+      background: var(--input-bg);
+      border: 2px solid var(--input-border);
       border-radius: 60px;
       outline: none;
       font-weight: 450;
-      color: #0b1f3b;
+      color: var(--text);
       transition: 0.15s;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.02);
     }
 
     #domainInput:focus {
-      border-color: #3a7bd5;
+      border-color: var(--accent);
       box-shadow: 0 8px 18px -8px rgba(58, 123, 213, 0.3);
     }
 
     #domainInput::placeholder {
-      color: #9babc7;
+      color: var(--placeholder);
       font-weight: 350;
       font-size: 1rem;
     }
 
     button {
-      background: #1e3a6b;
+      background: var(--accent-dark);
       border: none;
       padding: 1rem 2.3rem;
       border-radius: 60px;
@@ -149,7 +335,7 @@
       align-items: center;
       justify-content: center;
       gap: 8px;
-      box-shadow: 0 12px 22px -10px #1e3a6b;
+      box-shadow: 0 12px 22px -10px var(--shadow-color);
       transition: all 0.2s;
       border: 1px solid rgba(255, 255, 255, 0.3);
       letter-spacing: 0.3px;
@@ -157,9 +343,9 @@
     }
 
     button:hover {
-      background: #143157;
+      background: var(--accent-darker);
       transform: scale(1.02);
-      box-shadow: 0 18px 28px -10px #122b4e;
+      box-shadow: 0 18px 28px -10px var(--shadow-color);
     }
 
     button:active {
@@ -186,13 +372,13 @@
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
     .result-area {
-      background: rgba(255,255,255,0.6);
+      background: var(--result-bg);
       backdrop-filter: blur(4px);
       border-radius: 2rem;
       padding: 1.8rem 1.8rem 1.8rem 2rem;
-      border: 1px solid white;
+      border: 1px solid var(--card-border);
       margin-top: 1rem;
-      box-shadow: inset 0 2px 4px rgba(255,255,255,0.8), 0 8px 14px -12px #1e2f5e;
+      box-shadow: inset 0 2px 4px rgba(255,255,255,0.1), 0 8px 14px -12px var(--shadow-color);
     }
 
     .result-header {
@@ -206,19 +392,19 @@
     .result-header h2 {
       font-size: 1.3rem;
       font-weight: 550;
-      color: #1b2c51;
+      color: var(--accent-dark);
     }
 
     .badge-domain {
-      background: #d2e0ff;
+      background: var(--chip-bg);
       border-radius: 40px;
       padding: 0.3rem 1rem;
       font-family: 'SF Mono', 'Fira Code', monospace;
       font-weight: 550;
       font-size: 1rem;
-      color: #11223d;
+      color: var(--chip-text);
       word-break: break-all;
-      border: 1px solid white;
+      border: 1px solid var(--card-border);
     }
 
     .record-list {
@@ -227,14 +413,14 @@
     }
 
     .record-item {
-      background: white;
+      background: var(--input-bg);
       border-radius: 50px;
       padding: 0.9rem 1.5rem;
       margin-bottom: 10px;
       font-family: 'SF Mono', 'Fira Code', Menlo, monospace;
       font-size: 1rem;
-      box-shadow: 0 4px 10px -6px #1e3a6b30;
-      border-left: 6px solid #3a7bd5;
+      box-shadow: 0 4px 10px -6px var(--shadow-soft);
+      border-left: 6px solid var(--accent);
       word-break: break-word;
       display: flex;
       flex-wrap: wrap;
@@ -249,8 +435,8 @@
     }
 
     .flag-tag {
-      background: #edf3ff;
-      color: #153e7a;
+      background: var(--chip-bg2);
+      color: var(--chip-text);
       padding: 0.2rem 1rem 0.2rem 0.8rem;
       border-radius: 40px;
       font-size: 0.85rem;
@@ -262,22 +448,22 @@
 
     .record-value {
       font-weight: 450;
-      color: #0b1f3b;
+      color: var(--text);
       word-break: break-word;
       flex: 1;
     }
 
     .empty-state {
-      background: #f8fbff;
+      background: var(--empty-bg);
       padding: 2rem 2rem;
       border-radius: 2rem;
-      color: #384e77;
+      color: var(--text-muted);
       font-weight: 400;
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 0.6rem;
-      border: 2px dashed #bbd2ff;
+      border: 2px dashed var(--empty-border);
       text-align: center;
     }
 
@@ -286,29 +472,29 @@
     }
 
     .error-message {
-      background: #ffeae9;
-      border-left: 6px solid #d14545;
+      background: var(--invalid-bg);
+      border-left: 6px solid var(--invalid-border);
       padding: 1.3rem 1.8rem;
       border-radius: 40px;
-      color: #a13030;
+      color: var(--invalid-text);
       font-weight: 480;
       display: flex;
       gap: 12px;
       align-items: center;
-      box-shadow: 0 6px 12px -6px #d1454530;
+      box-shadow: 0 6px 12px -6px rgba(209, 69, 69, 0.19);
     }
 
     /* generator section */
     .generator-section {
       margin-top: 2.2rem;
       padding-top: 1.2rem;
-      border-top: 2px dashed #b6caf0;
+      border-top: 2px dashed var(--select-border);
     }
 
     .section-title {
       font-weight: 600;
       font-size: 1.2rem;
-      color: #1b2c51;
+      color: var(--accent-dark);
       margin-bottom: 1.5rem;
       display: flex;
       align-items: center;
@@ -331,29 +517,29 @@
     .gen-label {
       min-width: 100px;
       font-weight: 550;
-      color: #1e3f70;
+      color: var(--accent-dark);
     }
 
     select, .gen-input {
-      background: white;
-      border: 2px solid #d5e2ff;
+      background: var(--input-bg);
+      border: 2px solid var(--select-border);
       padding: 0.8rem 1.2rem;
       border-radius: 40px;
       font-size: 0.95rem;
-      color: #121f3a;
+      color: var(--text);
       outline: none;
       flex: 1 1 200px;
     }
 
     select:focus, .gen-input:focus {
-      border-color: #3a7bd5;
+      border-color: var(--accent);
     }
 
     .gen-input {
       font-family: 'SF Mono', monospace;
     }
 
-    /* New styles for the combobox/datalist */
+    /* combobox/datalist */
     .value-input-wrapper {
       position: relative;
       flex: 1 1 200px;
@@ -362,15 +548,16 @@
     .value-input-wrapper input {
       width: 100%;
       padding: 0.8rem 1.2rem;
-      border: 2px solid #d5e2ff;
+      border: 2px solid var(--select-border);
       border-radius: 40px;
       font-size: 0.95rem;
       font-family: 'SF Mono', monospace;
-      background: white;
+      background: var(--input-bg);
+      color: var(--text);
     }
 
     .value-input-wrapper input:focus {
-      border-color: #3a7bd5;
+      border-color: var(--accent);
       outline: none;
     }
 
@@ -379,8 +566,8 @@
       top: 100%;
       left: 0;
       right: 0;
-      background: white;
-      border: 2px solid #d5e2ff;
+      background: var(--input-bg);
+      border: 2px solid var(--select-border);
       border-top: none;
       border-radius: 0 0 20px 20px;
       max-height: 200px;
@@ -395,11 +582,13 @@
       cursor: pointer;
       font-family: 'SF Mono', monospace;
       font-size: 0.9rem;
-      border-bottom: 1px solid #f0f4ff;
+      color: var(--text);
+      border-bottom: 1px solid var(--chip-bg2);
     }
 
-    .suggestions-dropdown div:hover {
-      background: #e9f0ff;
+    .suggestions-dropdown div:hover,
+    .suggestions-dropdown div.active {
+      background: var(--chip-bg2);
     }
 
     .suggestions-dropdown div:last-child {
@@ -408,17 +597,28 @@
 
     .tag-hint {
       font-size: 0.85rem;
-      color: #5b729c;
+      color: var(--text-soft);
+    }
+
+    .field-error {
+      font-size: 0.85rem;
+      color: var(--invalid-text);
+      display: none;
+    }
+
+    .field-error.visible {
+      display: block;
     }
 
     .generated-record-box {
-      background: #e2edff;
+      background: var(--chip-bg);
       border-radius: 40px;
       padding: 1rem 1.8rem;
       font-family: 'SF Mono', monospace;
       font-size: 1rem;
+      color: var(--text);
       word-break: break-all;
-      border: 2px solid white;
+      border: 2px solid var(--card-border);
       margin: 0.5rem 0 1rem;
     }
 
@@ -430,31 +630,31 @@
     }
 
     .secondary-btn {
-      background: white;
-      color: #1e3a6b;
-      border: 2px solid #b8ceff;
-      box-shadow: 0 6px 12px -8px #1e3a6b70;
+      background: var(--input-bg);
+      color: var(--accent-dark);
+      border: 2px solid var(--select-border);
+      box-shadow: 0 6px 12px -8px rgba(30, 58, 107, 0.44);
     }
 
     .secondary-btn:hover {
-      background: #ecf3ff;
-      border-color: #7fa2e0;
+      background: var(--chip-bg2);
+      border-color: var(--accent);
     }
 
     .note {
       margin-top: 2rem;
       font-size: 0.85rem;
-      color: #4b5f8a;
+      color: var(--text-muted);
       display: flex;
       justify-content: center;
       gap: 2rem;
       flex-wrap: wrap;
-      border-top: 1px solid #cdddfa;
+      border-top: 1px solid var(--select-border);
       padding-top: 1.5rem;
     }
 
     .note a {
-      color: #1e3f70;
+      color: var(--accent-dark);
       font-weight: 550;
       text-decoration: none;
       border-bottom: 1px dotted;
@@ -466,22 +666,40 @@
       margin-top: 2.2rem;
       text-align: center;
       font-size: 0.9rem;
-      color: #57749e;
+      color: var(--text-muted);
+    }
+
+    footer a {
+      color: var(--text-muted);
+      text-decoration: underline;
+    }
+
+    footer a:hover {
+      color: var(--accent-dark);
+    }
+
+    @media (max-width: 480px) {
+      .glass-card { padding: 2rem 1.3rem; border-radius: 1.6rem; }
     }
   </style>
 </head>
 <body>
 <div class="glass-card">
-  <h1>
-    <span>🔍 CAA · inspect & build</span>
-  </h1>
+  <div class="top-bar">
+    <h1>
+      <span>🔍 CAA · inspect & build</span>
+    </h1>
+    <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode" title="Toggle dark mode">🌙</button>
+  </div>
   <div class="subhead">
     Check existing <strong>CAA records</strong> or generate new ones — load existing to edit
   </div>
 
+  <h2 class="sr-only">Check a domain's CAA records</h2>
+
   <!-- main input group -->
   <div class="input-group">
-    <label>
+    <label for="domainInput">
       <span>Domain name</span>
       <i>example.com</i>
     </label>
@@ -495,11 +713,11 @@
   </div>
 
   <!-- dynamic result card (lookup) -->
-  <div class="result-area" id="resultContainer">
+  <div class="result-area" id="resultContainer" aria-live="polite">
     <!-- default info / placeholder (will be replaced by JS) -->
     <div class="empty-state" id="placeholderState">
       <span>📋</span>
-      <div>Enter a domain and click “Check CAA”<br> <span style="font-size:0.9rem;">CAA records show which CAs are allowed to issue certificates.</span></div>
+      <div>Enter a domain and click "Check CAA"<br> <span style="font-size:0.9rem;">CAA records show which CAs are allowed to issue certificates.</span></div>
     </div>
 
     <!-- these sections are dynamically filled/ toggled by javascript -->
@@ -509,14 +727,14 @@
 
   <!-- CAA GENERATOR SECTION (with load existing) -->
   <div class="generator-section">
-    <div class="section-title">
+    <h2 class="section-title">
       <span>🛠️ CAA record generator</span>
-      <span style="font-size:0.85rem; background:#d9e6ff; padding:0.2rem 1rem; border-radius:30px;">load & edit</span>
-    </div>
+      <span style="font-size:0.85rem; background: var(--chip-bg); color: var(--chip-text); padding:0.2rem 1rem; border-radius:30px;">load & edit</span>
+    </h2>
     <div class="generator-grid">
       <!-- flag + tag + value -->
       <div class="gen-row">
-        <span class="gen-label">Flag</span>
+        <label class="gen-label" for="genFlag">Flag</label>
         <select id="genFlag">
           <option value="0">0 (critical)</option>
           <option value="128">128 (non-critical)</option>
@@ -525,7 +743,7 @@
         <span class="tag-hint">usually 0</span>
       </div>
       <div class="gen-row">
-        <span class="gen-label">Tag</span>
+        <label class="gen-label" for="genTag">Tag</label>
         <select id="genTag">
           <option value="issue">issue</option>
           <option value="issuewild">issuewild</option>
@@ -533,42 +751,44 @@
         </select>
       </div>
       <div class="gen-row">
-        <span class="gen-label">Value</span>
+        <label class="gen-label" for="genValue">Value</label>
         <div class="value-input-wrapper">
-          <input type="text" id="genValue" placeholder="Type or select a CA..." value="letsencrypt.org" autocomplete="off">
-          <div id="suggestions" class="suggestions-dropdown"></div>
+          <input type="text" id="genValue" placeholder="Type or select a CA..." value="letsencrypt.org" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="suggestions" aria-autocomplete="list">
+          <div id="suggestions" class="suggestions-dropdown" role="listbox" aria-label="Common certificate authorities"></div>
         </div>
         <span class="tag-hint">common CAs shown</span>
       </div>
+      <div class="field-error" id="genValueError" role="alert">Please enter a value (e.g., ca.example.com)</div>
 
       <div class="generated-record-box" id="generatedPreview">
         0 issue "letsencrypt.org"
       </div>
 
       <div class="action-buttons">
-        <button id="addRecordBtn" class="secondary-btn" style="background:#e9f0ff; color:#0f2c55;">➕ Add to list</button>
-        <button id="loadExistingBtn" class="secondary-btn" style="background:#ddeaff;">📂 Load existing from lookup</button>
+        <button id="addRecordBtn" class="secondary-btn" style="background: var(--chip-bg2); color: var(--accent-dark);">➕ Add to list</button>
+        <button id="loadExistingBtn" class="secondary-btn" style="background: var(--chip-bg);">📂 Load existing from lookup</button>
         <button id="clearGenBtn" class="secondary-btn">🗑️ Reset</button>
       </div>
+      <div class="field-error" id="loadExistingHint" role="status">No existing records loaded yet — run a lookup above first.</div>
 
       <!-- accumulated records for generation -->
       <div style="margin-top: 0.8rem;">
-        <span style="font-weight:550; color:#1a3b6e;">Records to publish: </span>
+        <span style="font-weight:550; color: var(--accent-dark);">Records to publish: </span>
         <span id="recordCount">0</span> (below)
       </div>
       <ul id="generatedList" style="list-style:none; margin-top:0.8rem;">
         <!-- dynamic list items will appear here -->
       </ul>
       <div style="display:flex; gap:1rem; flex-wrap:wrap; margin-top:1rem;">
-        <button id="generateBindText" style="background: #2e4a7c;">📄 Show as BIND lines</button>
+        <button id="generateBindText" style="background: var(--accent-dark);">📄 Show as BIND lines</button>
         <button id="clearAllRecords" class="secondary-btn">🗑️ Clear all</button>
       </div>
-      <div id="bindOutput" style="background:#f2f7ff; border-radius:30px; padding:1rem 1.5rem; font-family: monospace; white-space:pre-wrap; margin-top:1rem; border:2px solid white; display:none;"></div>
+      <div id="bindOutput" style="background: var(--chip-bg2); color: var(--text); border-radius:30px; padding:1rem 1.5rem; font-family: monospace; white-space:pre-wrap; margin-top:1rem; border:2px solid var(--card-border); display:none;" aria-live="polite"></div>
     </div>
   </div>
 
   <footer>
-    ⚡ using <strong>Google DNS over HTTPS</strong> · build CAA records ready for zone file
+    ⚡ using <strong>Google DNS over HTTPS</strong> · build CAA records ready for zone file · <a href="https://hbenali.ovh" target="_blank" rel="noopener noreferrer">hbenali.ovh</a>
   </footer>
 </div>
 
@@ -588,16 +808,52 @@
     const genFlag = document.getElementById('genFlag');
     const genTag = document.getElementById('genTag');
     const genValue = document.getElementById('genValue');
+    const genValueError = document.getElementById('genValueError');
     const suggestions = document.getElementById('suggestions');
     const generatedPreview = document.getElementById('generatedPreview');
     const addRecordBtn = document.getElementById('addRecordBtn');
     const loadExistingBtn = document.getElementById('loadExistingBtn');
+    const loadExistingHint = document.getElementById('loadExistingHint');
     const clearGenBtn = document.getElementById('clearGenBtn');
     const generatedList = document.getElementById('generatedList');
     const recordCountSpan = document.getElementById('recordCount');
     const generateBindText = document.getElementById('generateBindText');
     const clearAllRecords = document.getElementById('clearAllRecords');
     const bindOutput = document.getElementById('bindOutput');
+
+    // Theme
+    const themeToggle = document.getElementById('themeToggle');
+    const THEME_KEY = 'caaCheckerTheme';
+
+    function getStoredTheme() {
+      try { return localStorage.getItem(THEME_KEY); } catch (e) { return null; }
+    }
+
+    function effectiveTheme() {
+      const stored = getStoredTheme();
+      if (stored === 'light' || stored === 'dark') return stored;
+      return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+
+    function applyTheme() {
+      const stored = getStoredTheme();
+      if (stored === 'light' || stored === 'dark') {
+        document.documentElement.setAttribute('data-theme', stored);
+      } else {
+        document.documentElement.removeAttribute('data-theme');
+      }
+      if (themeToggle) themeToggle.textContent = effectiveTheme() === 'dark' ? '☀️' : '🌙';
+    }
+
+    if (themeToggle) {
+      themeToggle.addEventListener('click', () => {
+        const next = effectiveTheme() === 'dark' ? 'light' : 'dark';
+        try { localStorage.setItem(THEME_KEY, next); } catch (e) {}
+        applyTheme();
+      });
+    }
+
+    applyTheme();
 
     // Common CAA values for autocomplete
     const commonCAValues = [
@@ -614,7 +870,6 @@
       'rapidssl.com',
       'buypass.com',
       'zerossl.com',
-      'ssl.com',
       'certauth.ssl.com',
       'amazontrust.com',
       'awstrust.com',
@@ -630,7 +885,7 @@
     function filterSuggestions(input) {
       if (!input) return commonCAValues;
       const lowerInput = input.toLowerCase();
-      return commonCAValues.filter(value => 
+      return commonCAValues.filter(value =>
         value.toLowerCase().includes(lowerInput)
       );
     }
@@ -639,9 +894,10 @@
     function showSuggestions() {
       const input = genValue.value;
       const filtered = filterSuggestions(input);
-      
+
       if (filtered.length === 0) {
         suggestions.style.display = 'none';
+        genValue.setAttribute('aria-expanded', 'false');
         return;
       }
 
@@ -649,21 +905,25 @@
       filtered.forEach(value => {
         const div = document.createElement('div');
         div.textContent = value;
+        div.setAttribute('role', 'option');
         div.onclick = () => {
           genValue.value = value;
           suggestions.style.display = 'none';
+          genValue.setAttribute('aria-expanded', 'false');
           updatePreview();
         };
         suggestions.appendChild(div);
       });
-      
+
       suggestions.style.display = 'block';
+      genValue.setAttribute('aria-expanded', 'true');
     }
 
     // Hide suggestions
     function hideSuggestions() {
       setTimeout(() => {
         suggestions.style.display = 'none';
+        genValue.setAttribute('aria-expanded', 'false');
       }, 200); // Delay to allow click on suggestion
     }
 
@@ -680,25 +940,30 @@
     document.addEventListener('click', (e) => {
       if (!genValue.contains(e.target) && !suggestions.contains(e.target)) {
         suggestions.style.display = 'none';
+        genValue.setAttribute('aria-expanded', 'false');
       }
     });
 
     // local array storing generated records (as raw strings, e.g. "0 issue \"letsencrypt.org\"")
     let generatedRecords = [];
 
+    // shared smart-quoting: wrap the value in quotes if it needs it for a zone file
+    function formatCAAValue(value) {
+      if (!value.startsWith('"') && (value.includes(' ') || value.includes('@') || value.includes(':'))) {
+        return `"${value}"`;
+      }
+      if (!value.startsWith('"') && !/^[a-zA-Z0-9.-]+$/.test(value)) {
+        return `"${value}"`;
+      }
+      return value;
+    }
+
     // helper to update preview based on inputs
     function updatePreview() {
       const flag = genFlag.value;
       const tag = genTag.value;
-      let value = genValue.value.trim() || '[value]';
-      
-      // smart quoting for preview
-      if (!value.startsWith('"') && (value.includes(' ') || value.includes('@') || value.includes(':'))) {
-        value = `"${value}"`;
-      } else if (!value.startsWith('"') && !value.match(/^[a-zA-Z0-9.-]+$/)) {
-        value = `"${value}"`;
-      }
-      generatedPreview.textContent = `${flag} ${tag} ${value}`;
+      const value = genValue.value.trim() || '[value]';
+      generatedPreview.textContent = `${flag} ${tag} ${formatCAAValue(value)}`;
     }
 
     genFlag.addEventListener('change', updatePreview);
@@ -709,16 +974,16 @@
     // render the list of generated records
     function renderGeneratedList() {
       if (generatedRecords.length === 0) {
-        generatedList.innerHTML = '<li style="background:#f2f7ff; border-radius:40px; padding:1rem; color:#5f73a1;">➕ No CAA records added yet. Use the form above.</li>';
+        generatedList.innerHTML = '<li style="background: var(--chip-bg2); border-radius:40px; padding:1rem; color: var(--text-soft);">➕ No CAA records added yet. Use the form above.</li>';
         recordCountSpan.textContent = '0';
         return;
       }
       let html = '';
       generatedRecords.forEach((rec, idx) => {
-        const escaped = rec.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-        html += `<li style="background:white; border-radius:40px; padding:0.8rem 1.5rem; margin-bottom:8px; display:flex; align-items:center; gap:10px; border-left:6px solid #5d8bda;">
-          <span style="flex:1; font-family:monospace;">${escaped}</span>
-          <button class="remove-record" data-index="${idx}" style="background:transparent; border:none; font-size:1.3rem; cursor:pointer; color:#b33; padding:0 6px;">&times;</button>
+        const escaped = escapeHtml(rec);
+        html += `<li style="background: var(--input-bg); border-radius:40px; padding:0.8rem 1.5rem; margin-bottom:8px; display:flex; align-items:center; gap:10px; border-left:6px solid var(--record-border);">
+          <span style="flex:1; font-family:monospace; color: var(--text);">${escaped}</span>
+          <button class="remove-record" data-index="${idx}" style="background:transparent; border:none; font-size:1.3rem; cursor:pointer; color: var(--invalid-text); padding:0 6px; box-shadow:none;">&times;</button>
         </li>`;
       });
       generatedList.innerHTML = html;
@@ -742,20 +1007,18 @@
       const tag = genTag.value;
       let value = genValue.value.trim();
       if (!value) {
-        alert('Please enter a value (e.g., ca.example.com)');
+        genValueError.classList.add('visible');
+        genValue.focus();
         return;
       }
-      // smart quoting: if contains spaces or special chars, wrap in quotes (but not double-quoted)
-      if (!value.startsWith('"') && (value.includes(' ') || value.includes('@') || value.includes(':'))) {
-        value = `"${value}"`;
-      } else if (!value.startsWith('"') && !/^[a-zA-Z0-9.-]+$/.test(value)) {
-        value = `"${value}"`;
-      }
-      const record = `${flag} ${tag} ${value}`;
+      genValueError.classList.remove('visible');
+      const record = `${flag} ${tag} ${formatCAAValue(value)}`;
       generatedRecords.push(record);
       renderGeneratedList();
       bindOutput.style.display = 'none';
     });
+
+    genValue.addEventListener('input', () => genValueError.classList.remove('visible'));
 
     // clear all generated
     clearAllRecords.addEventListener('click', () => {
@@ -769,28 +1032,27 @@
       genFlag.value = '0';
       genTag.value = 'issue';
       genValue.value = 'letsencrypt.org';
+      genValueError.classList.remove('visible');
       updatePreview();
     });
 
-    // load existing from last lookup (from recordsContainer if visible)
+    // load existing from last lookup — appends any records not already in the list,
+    // so nothing is silently discarded and no confirmation dialog is needed
+    let lastRawRecords = null;  // stores raw record strings for generator loading
+
     loadExistingBtn.addEventListener('click', () => {
-      // try to fetch records currently displayed in recordsContainer (parsed from last lookup)
-      if (recordsContainer.style.display !== 'block') {
-        alert('No existing records loaded. Please perform a lookup first.');
+      if (!lastRawRecords || lastRawRecords.length === 0) {
+        loadExistingHint.textContent = recordsContainer.style.display !== 'block'
+          ? 'No existing records loaded yet — run a lookup above first.'
+          : 'No CAA records found in the last lookup.';
+        loadExistingHint.classList.add('visible');
         return;
       }
-      // we stored them in a data attribute or we re-parse? easier: we keep lastRawRecords from last successful query
-      if (lastRawRecords && lastRawRecords.length > 0) {
-        // replace generatedRecords? we will append? we'll ask: confirm replace or append? we do replace for simplicity.
-        if (generatedRecords.length > 0 && !confirm('Replace current generated records with the ones from lookup?')) {
-          return;
-        }
-        generatedRecords = [...lastRawRecords]; // these are raw strings like "0 issue \"letsencrypt.org\""
-        renderGeneratedList();
-        bindOutput.style.display = 'none';
-      } else {
-        alert('No CAA records found in last lookup (or they were empty).');
-      }
+      loadExistingHint.classList.remove('visible');
+      const added = lastRawRecords.filter(rec => !generatedRecords.includes(rec));
+      generatedRecords = generatedRecords.concat(added);
+      renderGeneratedList();
+      bindOutput.style.display = 'none';
     });
 
     // generate BIND lines
@@ -809,9 +1071,7 @@
       bindOutput.style.display = 'block';
     });
 
-    // ----- lookup logic (same as before, with small tweak to store lastRawRecords) -----
-    let lastRawRecords = null;  // stores raw record strings for generator loading
-
+    // ----- lookup logic -----
     function setActiveView(view) {
       placeholderState.style.display = 'none';
       recordsContainer.style.display = 'none';
@@ -846,7 +1106,7 @@
     function renderRecords(domain, records) {
       if (!records || records.length === 0) {
         recordsContainer.innerHTML = `
-          <div class="empty-state" style="background:#f0f7ff;">
+          <div class="empty-state" style="background: var(--empty-bg);">
             <span>🔓</span>
             <div><strong style="font-size:1.2rem;">No CAA records found</strong></div>
             <div style="margin-top:0.5rem;">Domain <code>${escapeHtml(domain)}</code> has no CAA policy.<br>Any CA may issue certificates.</div>
@@ -868,7 +1128,7 @@
           itemsHtml += `
             <li class="record-item">
               <span class="flag-tag">⚑ ${flagPart}</span>
-              <span class="flag-tag" style="background:#d6e6ff;">🏷 ${tagPart}</span>
+              <span class="flag-tag">🏷 ${tagPart}</span>
               <span class="record-value">${escapeHtml(valuePart)}</span>
             </li>
           `;
@@ -882,7 +1142,7 @@
           <span class="badge-domain">${escapeHtml(domain)}</span>
         </div>
         <ul class="record-list">${itemsHtml}</ul>
-        <div style="margin-top: 0.8rem; font-size:0.9rem; color:#4263a5;">${records.length} record(s) found</div>
+        <div style="margin-top: 0.8rem; font-size:0.9rem; color: var(--text-muted);">${records.length} record(s) found</div>
       `;
     }
 
@@ -935,22 +1195,18 @@
     checkBtn.addEventListener('click', performLookup);
     domainInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') performLookup(); });
 
-    // ===== NEW CODE: Handle URL parameter on page load =====
+    // Handle URL parameter on page load
     function handleUrlParameter() {
       const urlParams = new URLSearchParams(window.location.search);
       const domainParam = urlParams.get('domain');
-      
+
       if (domainParam) {
-        // Set the input field value
         domainInput.value = domainParam;
-        // Automatically trigger the CAA lookup
         performLookup();
       }
     }
 
-    // Call the function when the page loads
     window.addEventListener('load', handleUrlParameter);
-    // ===== END OF NEW CODE =====
 
     // initial placeholder
     renderGeneratedList(); // empty list

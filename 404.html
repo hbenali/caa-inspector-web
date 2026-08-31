@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>404 · page not found · CAA checker</title>
-  <!-- SVG Favicon - works in all modern browsers -->
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-  <link rel="alternate icon" href="/favicon.ico"> <!-- Fallback for old browsers -->
-  
-  <!-- Optional: For better iOS/Android support -->
-  <link rel="apple-touch-icon" href="/favicon.svg"> <!-- iOS will use SVG -->
-  <meta name="theme-color" content="#1e3a6b">
+  <title>404 · Page not found · CAA Checker</title>
+  <meta name="description" content="The page you're looking for doesn't exist. Head back to CAA Checker to inspect or generate a domain's CAA records.">
   <meta name="robots" content="noindex, follow">
+
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="alternate icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <meta name="theme-color" content="#1e3a6b">
+
   <style>
     * {
       margin: 0;
@@ -19,35 +19,86 @@
       box-sizing: border-box;
     }
 
+    :root {
+      --bg-1: #f0f5ff;
+      --bg-2: #e9eefa;
+      --text: #1a2639;
+      --text-muted: #3f4e77;
+      --card-bg: rgba(255, 255, 255, 0.75);
+      --card-border: rgba(255, 255, 255, 0.5);
+      --accent: #3a7bd5;
+      --accent-dark: #1e3a6b;
+      --accent-darker: #143157;
+      --input-bg: #ffffff;
+      --input-border: rgba(58, 123, 213, 0.2);
+      --select-border: #b8ceff;
+      --shadow-color: rgba(0, 20, 60, 0.25);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --bg-1: #0f172a;
+        --bg-2: #1c2c40;
+        --text: #e6edf5;
+        --text-muted: #93aec4;
+        --card-bg: rgba(20, 30, 46, 0.78);
+        --card-border: rgba(255, 255, 255, 0.08);
+        --accent: #3498db;
+        --accent-dark: #5dade2;
+        --accent-darker: #6cc0f0;
+        --input-bg: #131f30;
+        --input-border: rgba(52, 152, 219, 0.25);
+        --select-border: #2d4257;
+        --shadow-color: rgba(0, 0, 0, 0.45);
+      }
+    }
+
+    :root[data-theme="dark"] {
+      --bg-1: #0f172a;
+      --bg-2: #1c2c40;
+      --text: #e6edf5;
+      --text-muted: #93aec4;
+      --card-bg: rgba(20, 30, 46, 0.78);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --accent: #3498db;
+      --accent-dark: #5dade2;
+      --accent-darker: #6cc0f0;
+      --input-bg: #131f30;
+      --input-border: rgba(52, 152, 219, 0.25);
+      --select-border: #2d4257;
+      --shadow-color: rgba(0, 0, 0, 0.45);
+    }
+
     body {
-      background: linear-gradient(145deg, #f0f5ff 0%, #e9eefa 100%);
+      background: linear-gradient(145deg, var(--bg-1) 0%, var(--bg-2) 100%);
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 1.5rem;
-      color: #1a2639;
+      color: var(--text);
+      transition: background 0.3s, color 0.3s;
     }
 
     .glass-card {
-      background: rgba(255, 255, 255, 0.75);
+      background: var(--card-bg);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
       border-radius: 2.5rem;
-      box-shadow: 0 25px 50px -12px rgba(0, 20, 60, 0.25), inset 0 1px 2px rgba(255,255,255,0.8);
+      box-shadow: 0 25px 50px -12px var(--shadow-color), inset 0 1px 2px rgba(255,255,255,0.1);
       width: 100%;
       max-width: 700px;
       padding: 3rem 2.5rem;
-      border: 1px solid rgba(255,255,255,0.5);
+      border: 1px solid var(--card-border);
       text-align: center;
     }
 
     .error-code {
-      font-size: 8rem;
+      font-size: clamp(4rem, 18vw, 8rem);
       font-weight: 700;
       line-height: 1;
-      background: linear-gradient(135deg, #1e2f5e, #3a7bd5);
+      background: linear-gradient(135deg, var(--accent-dark), var(--accent));
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
@@ -58,7 +109,7 @@
     .divider {
       width: 80px;
       height: 4px;
-      background: linear-gradient(90deg, #3a7bd5, #a1c1ff);
+      background: linear-gradient(90deg, var(--accent), #a1c1ff);
       border-radius: 2px;
       margin: 1.5rem auto;
     }
@@ -66,13 +117,13 @@
     h1 {
       font-size: 2rem;
       font-weight: 600;
-      color: #1e3a6b;
+      color: var(--accent-dark);
       margin-bottom: 1rem;
     }
 
     .message {
       font-size: 1.2rem;
-      color: #3f4e77;
+      color: var(--text-muted);
       margin-bottom: 2.5rem;
       line-height: 1.5;
     }
@@ -85,8 +136,8 @@
       margin-bottom: 2rem;
       font-family: 'SF Mono', 'Fira Code', monospace;
       font-size: 1.1rem;
-      color: #15305c;
-      border: 1px solid rgba(255,255,255,0.8);
+      color: var(--accent-dark);
+      border: 1px solid var(--card-border);
     }
 
     .action-buttons {
@@ -98,7 +149,7 @@
     }
 
     .primary-btn {
-      background: #1e3a6b;
+      background: var(--accent-dark);
       border: none;
       padding: 1rem 2.3rem;
       border-radius: 60px;
@@ -110,22 +161,22 @@
       align-items: center;
       justify-content: center;
       gap: 8px;
-      box-shadow: 0 12px 22px -10px #1e3a6b;
+      box-shadow: 0 12px 22px -10px var(--shadow-color);
       transition: all 0.2s;
       border: 1px solid rgba(255, 255, 255, 0.3);
       text-decoration: none;
     }
 
     .primary-btn:hover {
-      background: #143157;
+      background: var(--accent-darker);
       transform: scale(1.02);
-      box-shadow: 0 18px 28px -10px #122b4e;
+      box-shadow: 0 18px 28px -10px var(--shadow-color);
     }
 
     .secondary-btn {
-      background: white;
-      color: #1e3a6b;
-      border: 2px solid #b8ceff;
+      background: var(--input-bg);
+      color: var(--accent-dark);
+      border: 2px solid var(--select-border);
       padding: 1rem 2.3rem;
       border-radius: 60px;
       font-weight: 600;
@@ -137,23 +188,23 @@
       gap: 8px;
       transition: all 0.2s;
       text-decoration: none;
-      box-shadow: 0 6px 12px -8px #1e3a6b70;
+      box-shadow: 0 6px 12px -8px var(--shadow-color);
     }
 
     .secondary-btn:hover {
-      background: #ecf3ff;
-      border-color: #7fa2e0;
+      background: rgba(58, 123, 213, 0.08);
+      border-color: var(--accent);
       transform: scale(1.01);
     }
 
     .search-suggestion {
       margin-top: 2.5rem;
       padding-top: 1.5rem;
-      border-top: 1px dashed #b6caf0;
+      border-top: 1px dashed var(--select-border);
     }
 
     .search-suggestion p {
-      color: #4b5f8a;
+      color: var(--text-muted);
       margin-bottom: 1rem;
       font-size: 0.95rem;
     }
@@ -162,9 +213,9 @@
       display: flex;
       max-width: 450px;
       margin: 0 auto;
-      background: white;
+      background: var(--input-bg);
       border-radius: 60px;
-      border: 2px solid rgba(58, 123, 213, 0.2);
+      border: 2px solid var(--input-border);
       overflow: hidden;
     }
 
@@ -175,11 +226,12 @@
       outline: none;
       font-size: 1rem;
       background: transparent;
-      color: #0b1f3b;
+      color: var(--text);
+      min-width: 0;
     }
 
     .inline-search button {
-      background: #1e3a6b;
+      background: var(--accent-dark);
       border: none;
       padding: 0 2rem;
       color: white;
@@ -189,23 +241,22 @@
     }
 
     .inline-search button:hover {
-      background: #143157;
+      background: var(--accent-darker);
     }
 
     footer {
       margin-top: 2.5rem;
-      color: #57749e;
+      color: var(--text-muted);
       font-size: 0.9rem;
     }
 
     footer a {
-      color: #1e3f70;
-      text-decoration: none;
-      border-bottom: 1px dotted;
+      color: var(--text-muted);
+      text-decoration: underline;
     }
 
     footer a:hover {
-      border-bottom: 2px solid;
+      color: var(--accent-dark);
     }
 
     .globe-icon {
@@ -213,15 +264,19 @@
       margin-right: 0.3rem;
       vertical-align: middle;
     }
+
+    @media (max-width: 480px) {
+      .glass-card { padding: 2.2rem 1.5rem; border-radius: 1.6rem; }
+    }
   </style>
 </head>
 <body>
   <div class="glass-card">
     <div class="error-code">404</div>
     <div class="divider"></div>
-    
+
     <h1>Page not found</h1>
-    
+
     <div class="message">
       The page you're looking for doesn't exist or has been moved.
     </div>
@@ -234,51 +289,47 @@
       <a href="/" class="primary-btn">
         <span>🏠</span> Go to homepage
       </a>
-      <a href="/" class="secondary-btn">
+      <a href="/?domain=example.com" class="secondary-btn">
         <span>🔍</span> Check CAA records
       </a>
     </div>
 
     <div class="search-suggestion">
       <p>Try checking CAA records for a domain:</p>
-      <div class="inline-search">
-        <input type="text" id="domainInput" placeholder="example.com" value="hbenali.ovh">
-        <button id="searchBtn">Check</button>
-      </div>
+      <form class="inline-search" id="jumpForm">
+        <input type="text" id="domainInput" placeholder="example.com" value="hbenali.ovh" aria-label="Domain name" autocomplete="off">
+        <button type="submit" id="searchBtn">Check</button>
+      </form>
     </div>
 
     <footer>
-      <a href="/">CAA record checker</a> · 
-      <a href="https://caa.hbenali.ovh/sitemap.xml">Sitemap</a> · 
-      <span>Lost? Let's get you back 🔍</span>
+      <a href="/">CAA record checker</a> ·
+      <a href="/sitemap.xml">Sitemap</a> ·
+      <a href="https://hbenali.ovh" target="_blank" rel="noopener noreferrer">hbenali.ovh</a>
     </footer>
   </div>
 
   <script>
-    // Add functionality to the inline search
-    document.getElementById('searchBtn').addEventListener('click', function() {
-      const domain = document.getElementById('domainInput').value.trim();
-      if (domain) {
-        // Redirect to homepage with the domain prefilled (via URL parameter)
-        window.location.href = '/?domain=' + encodeURIComponent(domain);
-      } else {
-        window.location.href = '/';
-      }
-    });
+    (function() {
+      try {
+        var theme = localStorage.getItem('caaCheckerTheme');
+        if (theme === 'light' || theme === 'dark') {
+          document.documentElement.setAttribute('data-theme', theme);
+        }
+      } catch (e) {}
 
-    // Allow Enter key in input
-    document.getElementById('domainInput').addEventListener('keypress', function(e) {
-      if (e.key === 'Enter') {
-        document.getElementById('searchBtn').click();
-      }
-    });
+      var form = document.getElementById('jumpForm');
+      var input = document.getElementById('domainInput');
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        var domain = input.value.trim();
+        window.location.href = domain ? '/?domain=' + encodeURIComponent(domain) : '/';
+      });
 
-    // If the URL has a domain parameter, prefill it (useful if someone came from a broken link)
-    const urlParams = new URLSearchParams(window.location.search);
-    const domainParam = urlParams.get('domain');
-    if (domainParam) {
-      document.getElementById('domainInput').value = domainParam;
-    }
+      var urlParams = new URLSearchParams(window.location.search);
+      var domainParam = urlParams.get('domain');
+      if (domainParam) input.value = domainParam;
+    })();
   </script>
 </body>
 </html>
