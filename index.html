@@ -85,6 +85,8 @@
       --accent: #3a7bd5;
       --accent-dark: #1e3a6b;
       --accent-darker: #143157;
+      --accent-solid: #1e3a6b;
+      --accent-solid-hover: #143157;
       --input-bg: #ffffff;
       --input-border: rgba(58, 123, 213, 0.2);
       --select-border: #d5e2ff;
@@ -115,6 +117,8 @@
         --accent: #3498db;
         --accent-dark: #5dade2;
         --accent-darker: #6cc0f0;
+        --accent-solid: #1f5f95;
+        --accent-solid-hover: #17456e;
         --input-bg: #131f30;
         --input-border: rgba(52, 152, 219, 0.25);
         --select-border: #2d4257;
@@ -145,6 +149,8 @@
       --accent: #3498db;
       --accent-dark: #5dade2;
       --accent-darker: #6cc0f0;
+      --accent-solid: #1f5f95;
+      --accent-solid-hover: #17456e;
       --input-bg: #131f30;
       --input-border: rgba(52, 152, 219, 0.25);
       --select-border: #2d4257;
@@ -323,7 +329,7 @@
     }
 
     button {
-      background: var(--accent-dark);
+      background: var(--accent-solid);
       border: none;
       padding: 1rem 2.3rem;
       border-radius: 60px;
@@ -343,7 +349,7 @@
     }
 
     button:hover {
-      background: var(--accent-darker);
+      background: var(--accent-solid-hover);
       transform: scale(1.02);
       box-shadow: 0 18px 28px -10px var(--shadow-color);
     }
@@ -695,6 +701,7 @@
     Check existing <strong>CAA records</strong> or generate new ones — load existing to edit
   </div>
 
+  <main>
   <h2 class="sr-only">Check a domain's CAA records</h2>
 
   <!-- main input group -->
@@ -780,12 +787,13 @@
         <!-- dynamic list items will appear here -->
       </ul>
       <div style="display:flex; gap:1rem; flex-wrap:wrap; margin-top:1rem;">
-        <button id="generateBindText" style="background: var(--accent-dark);">📄 Show as BIND lines</button>
+        <button id="generateBindText" style="background: var(--accent-solid);">📄 Show as BIND lines</button>
         <button id="clearAllRecords" class="secondary-btn">🗑️ Clear all</button>
       </div>
       <div id="bindOutput" style="background: var(--chip-bg2); color: var(--text); border-radius:30px; padding:1rem 1.5rem; font-family: monospace; white-space:pre-wrap; margin-top:1rem; border:2px solid var(--card-border); display:none;" aria-live="polite"></div>
     </div>
   </div>
+  </main>
 
   <footer>
     ⚡ using <strong>Google DNS over HTTPS</strong> · build CAA records ready for zone file · <a href="https://hbenali.ovh" target="_blank" rel="noopener noreferrer">hbenali.ovh</a>
