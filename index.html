@@ -8,6 +8,10 @@
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://caa.hbenali.ovh/">
 
+  <!-- Security (static hosting: no custom HTTP headers, so CSP/referrer are set here; X-Frame-Options/X-Content-Type-Options need a real header and aren't achievable via meta) -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://dns.google; object-src 'none'; base-uri 'self'; form-action 'self'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+
   <!-- Open Graph -->
   <meta property="og:type" content="website">
   <meta property="og:title" content="CAA Checker — DNS CAA Record Inspector & Generator">
@@ -79,7 +83,7 @@
       --bg-2: #e9eefa;
       --text: #1a2639;
       --text-muted: #3f4e77;
-      --text-soft: #5b729c;
+      --text-soft: #465c80;
       --card-bg: rgba(255, 255, 255, 0.75);
       --card-border: rgba(255, 255, 255, 0.5);
       --accent: #3a7bd5;
