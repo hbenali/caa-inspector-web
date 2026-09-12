@@ -1,0 +1,8 @@
+# CAA Checker
+
+> Free, single-page tool to inspect and generate DNS CAA (Certification Authority Authorization) records.
+
+Static site (no backend, no build step, no dependencies) at https://caa.hbenali.ovh — a single `index.html` calling public APIs directly from the browser. Looks up a domain's CAA records via DNS-over-HTTPS, and includes a generator for `issue`/`issuewild`/`iodef` records with CA autocomplete and BIND zone-file export.
+
+## Pages
+- [CAA Checker](https://caa.hbenali.ovh/): the tool itself.
