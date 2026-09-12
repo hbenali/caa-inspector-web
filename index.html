@@ -33,6 +33,11 @@
   <link rel="alternate icon" href="/favicon.ico">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <meta name="theme-color" content="#1e3a6b">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="CAA Checker">
 
   <!-- dns.google is only hit on-demand after a lookup -->
   <link rel="dns-prefetch" href="https://dns.google">
@@ -1223,6 +1228,10 @@
     // initial placeholder
     renderGeneratedList(); // empty list
   })();
+
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js');
+  }
 </script>
 </body>
 </html>

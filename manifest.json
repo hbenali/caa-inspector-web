@@ -1,0 +1,15 @@
+{
+  "name": "CAA Checker — DNS CAA Record Inspector & Generator",
+  "short_name": "CAA Checker",
+  "description": "Inspect a domain's DNS CAA records and generate new issue/issuewild/iodef records.",
+  "start_url": ".",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f0f5ff",
+  "theme_color": "#1e3a6b",
+  "icons": [
+    { "src": "favicon.svg", "sizes": "any", "type": "image/svg+xml" },
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
