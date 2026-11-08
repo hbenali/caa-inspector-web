@@ -32,7 +32,7 @@
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="alternate icon" href="/favicon.ico">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-  <meta name="theme-color" content="#1e3a6b">
+  <meta name="theme-color" content="#0c1218">
   <link rel="manifest" href="/manifest.json">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -75,679 +75,61 @@
   }
   </script>
 
-  <!-- modern clean CSS, system fonts, glassmorphism touch -->
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
 
-    :root {
-      --bg-1: #f0f5ff;
-      --bg-2: #e9eefa;
-      --text: #1a2639;
-      --text-muted: #3f4e77;
-      --text-soft: #465c80;
-      --card-bg: rgba(255, 255, 255, 0.75);
-      --card-border: rgba(255, 255, 255, 0.5);
-      --accent: #3a7bd5;
-      --accent-dark: #1e3a6b;
-      --accent-darker: #143157;
-      --accent-solid: #1e3a6b;
-      --accent-solid-hover: #143157;
-      --input-bg: #ffffff;
-      --input-border: rgba(58, 123, 213, 0.2);
-      --select-border: #d5e2ff;
-      --placeholder: #9babc7;
-      --chip-bg: #d2e0ff;
-      --chip-bg2: #edf3ff;
-      --chip-text: #15305c;
-      --result-bg: rgba(255, 255, 255, 0.6);
-      --empty-bg: #f8fbff;
-      --empty-border: #bbd2ff;
-      --invalid-bg: #ffeae9;
-      --invalid-text: #a13030;
-      --invalid-border: #d14545;
-      --shadow-color: rgba(0, 20, 60, 0.25);
-      --shadow-soft: rgba(30, 58, 107, 0.19);
-      --record-border: #5d8bda;
-    }
-
-    @media (prefers-color-scheme: dark) {
-      :root:not([data-theme="light"]) {
-        --bg-1: #0f172a;
-        --bg-2: #1c2c40;
-        --text: #e6edf5;
-        --text-muted: #93aec4;
-        --text-soft: #7c96ad;
-        --card-bg: rgba(20, 30, 46, 0.78);
-        --card-border: rgba(255, 255, 255, 0.08);
-        --accent: #3498db;
-        --accent-dark: #5dade2;
-        --accent-darker: #6cc0f0;
-        --accent-solid: #1f5f95;
-        --accent-solid-hover: #17456e;
-        --input-bg: #131f30;
-        --input-border: rgba(52, 152, 219, 0.25);
-        --select-border: #2d4257;
-        --placeholder: #4a6478;
-        --chip-bg: #1b2f45;
-        --chip-bg2: #16283b;
-        --chip-text: #bcdcf7;
-        --result-bg: rgba(19, 31, 48, 0.6);
-        --empty-bg: #131f30;
-        --empty-border: #2d4257;
-        --invalid-bg: #3a1414;
-        --invalid-text: #ff8a8a;
-        --invalid-border: #b5453a;
-        --shadow-color: rgba(0, 0, 0, 0.45);
-        --shadow-soft: rgba(0, 0, 0, 0.35);
-        --record-border: #5dade2;
-      }
-    }
-
-    :root[data-theme="dark"] {
-      --bg-1: #0f172a;
-      --bg-2: #1c2c40;
-      --text: #e6edf5;
-      --text-muted: #93aec4;
-      --text-soft: #7c96ad;
-      --card-bg: rgba(20, 30, 46, 0.78);
-      --card-border: rgba(255, 255, 255, 0.08);
-      --accent: #3498db;
-      --accent-dark: #5dade2;
-      --accent-darker: #6cc0f0;
-      --accent-solid: #1f5f95;
-      --accent-solid-hover: #17456e;
-      --input-bg: #131f30;
-      --input-border: rgba(52, 152, 219, 0.25);
-      --select-border: #2d4257;
-      --placeholder: #4a6478;
-      --chip-bg: #1b2f45;
-      --chip-bg2: #16283b;
-      --chip-text: #bcdcf7;
-      --result-bg: rgba(19, 31, 48, 0.6);
-      --empty-bg: #131f30;
-      --empty-border: #2d4257;
-      --invalid-bg: #3a1414;
-      --invalid-text: #ff8a8a;
-      --invalid-border: #b5453a;
-      --shadow-color: rgba(0, 0, 0, 0.45);
-      --shadow-soft: rgba(0, 0, 0, 0.35);
-      --record-border: #5dade2;
-    }
-
-    body {
-      background: linear-gradient(145deg, var(--bg-1) 0%, var(--bg-2) 100%);
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 1.5rem;
-      color: var(--text);
-      transition: background 0.3s, color 0.3s;
-    }
-
-    .sr-only {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      padding: 0;
-      margin: -1px;
-      overflow: hidden;
-      clip: rect(0, 0, 0, 0);
-      white-space: nowrap;
-      border: 0;
-    }
-
-    .glass-card {
-      background: var(--card-bg);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border-radius: 2.5rem;
-      box-shadow: 0 25px 50px -12px var(--shadow-color), inset 0 1px 2px rgba(255, 255, 255, 0.1);
-      width: 100%;
-      max-width: 900px;
-      padding: 2.5rem 2rem;
-      border: 1px solid var(--card-border);
-      transition: box-shadow 0.2s, background 0.3s, border 0.3s;
-    }
-
-    .top-bar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 1rem;
-      flex-wrap: wrap;
-    }
-
-    h1 {
-      font-size: 2.2rem;
-      font-weight: 600;
-      letter-spacing: -0.02em;
-      background: linear-gradient(135deg, var(--accent-dark), var(--accent));
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      margin-bottom: 0.2rem;
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-    }
-
-    .theme-toggle {
-      background: var(--input-bg);
-      border: 1px solid var(--select-border);
-      width: 2.7rem;
-      height: 2.7rem;
-      min-width: 2.7rem;
-      border-radius: 50%;
-      font-size: 1.2rem;
-      padding: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      box-shadow: none;
-      color: var(--text);
-    }
-
-    .theme-toggle:hover {
-      background: var(--input-bg);
-      transform: scale(1.08);
-      box-shadow: 0 8px 16px -8px var(--shadow-color);
-    }
-
-    .subhead {
-      font-size: 1rem;
-      font-weight: 400;
-      color: var(--text-muted);
-      margin-bottom: 1.8rem;
-      border-left: 3px solid var(--accent);
-      padding-left: 1rem;
-      background: rgba(58, 123, 213, 0.06);
-      border-radius: 0 8px 8px 0;
-    }
-
-    .subhead code {
-      background: rgba(30, 47, 94, 0.08);
-      padding: 0.2rem 0.5rem;
-      border-radius: 30px;
-      font-weight: 500;
-      color: var(--accent-dark);
-    }
-
-    .input-group {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-      margin-bottom: 2rem;
-    }
-
-    label {
-      font-weight: 550;
-      font-size: 0.95rem;
-      letter-spacing: 0.02em;
-      color: var(--accent-dark);
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    label i {
-      font-style: normal;
-      background: var(--chip-bg);
-      padding: 2px 8px;
-      border-radius: 30px;
-      font-size: 0.8rem;
-      color: var(--chip-text);
-    }
-
-    .domain-input-wrapper {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.75rem;
-      align-items: center;
-    }
-
-    #domainInput {
-      flex: 1 1 260px;
-      padding: 1rem 1.4rem;
-      font-size: 1.1rem;
-      background: var(--input-bg);
-      border: 2px solid var(--input-border);
-      border-radius: 60px;
-      outline: none;
-      font-weight: 450;
-      color: var(--text);
-      transition: 0.15s;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.02);
-    }
-
-    #domainInput:focus {
-      border-color: var(--accent);
-      box-shadow: 0 8px 18px -8px rgba(58, 123, 213, 0.3);
-    }
-
-    #domainInput::placeholder {
-      color: var(--placeholder);
-      font-weight: 350;
-      font-size: 1rem;
-    }
-
-    button {
-      background: var(--accent-solid);
-      border: none;
-      padding: 1rem 2.3rem;
-      border-radius: 60px;
-      font-weight: 600;
-      font-size: 1.05rem;
-      color: white;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      box-shadow: 0 12px 22px -10px var(--shadow-color);
-      transition: all 0.2s;
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      letter-spacing: 0.3px;
-      white-space: nowrap;
-    }
-
-    button:hover {
-      background: var(--accent-solid-hover);
-      transform: scale(1.02);
-      box-shadow: 0 18px 28px -10px var(--shadow-color);
-    }
-
-    button:active {
-      transform: scale(0.98);
-    }
-
-    button:disabled {
-      opacity: 0.5;
-      pointer-events: none;
-      filter: grayscale(0.3);
-    }
-
-    .loader {
-      display: inline-block;
-      width: 1.1rem;
-      height: 1.1rem;
-      border: 2px solid rgba(255,255,255,0.3);
-      border-top: 2px solid white;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      margin-right: 6px;
-    }
-
-    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-    .result-area {
-      background: var(--result-bg);
-      backdrop-filter: blur(4px);
-      border-radius: 2rem;
-      padding: 1.8rem 1.8rem 1.8rem 2rem;
-      border: 1px solid var(--card-border);
-      margin-top: 1rem;
-      box-shadow: inset 0 2px 4px rgba(255,255,255,0.1), 0 8px 14px -12px var(--shadow-color);
-    }
-
-    .result-header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 1.5rem;
-      flex-wrap: wrap;
-    }
-
-    .result-header h2 {
-      font-size: 1.3rem;
-      font-weight: 550;
-      color: var(--accent-dark);
-    }
-
-    .badge-domain {
-      background: var(--chip-bg);
-      border-radius: 40px;
-      padding: 0.3rem 1rem;
-      font-family: 'SF Mono', 'Fira Code', monospace;
-      font-weight: 550;
-      font-size: 1rem;
-      color: var(--chip-text);
-      word-break: break-all;
-      border: 1px solid var(--card-border);
-    }
-
-    .record-list {
-      list-style: none;
-      margin: 1.2rem 0 0.8rem 0;
-    }
-
-    .record-item {
-      background: var(--input-bg);
-      border-radius: 50px;
-      padding: 0.9rem 1.5rem;
-      margin-bottom: 10px;
-      font-family: 'SF Mono', 'Fira Code', Menlo, monospace;
-      font-size: 1rem;
-      box-shadow: 0 4px 10px -6px var(--shadow-soft);
-      border-left: 6px solid var(--accent);
-      word-break: break-word;
-      display: flex;
-      flex-wrap: wrap;
-      align-items: baseline;
-      gap: 0.6rem;
-      transition: 0.1s;
-    }
-
-    .record-item:hover {
-      border-left-width: 10px;
-      padding-left: 1.3rem;
-    }
-
-    .flag-tag {
-      background: var(--chip-bg2);
-      color: var(--chip-text);
-      padding: 0.2rem 1rem 0.2rem 0.8rem;
-      border-radius: 40px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.3rem;
-    }
-
-    .record-value {
-      font-weight: 450;
-      color: var(--text);
-      word-break: break-word;
-      flex: 1;
-    }
-
-    .empty-state {
-      background: var(--empty-bg);
-      padding: 2rem 2rem;
-      border-radius: 2rem;
-      color: var(--text-muted);
-      font-weight: 400;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.6rem;
-      border: 2px dashed var(--empty-border);
-      text-align: center;
-    }
-
-    .empty-state span {
-      font-size: 2.5rem;
-    }
-
-    .error-message {
-      background: var(--invalid-bg);
-      border-left: 6px solid var(--invalid-border);
-      padding: 1.3rem 1.8rem;
-      border-radius: 40px;
-      color: var(--invalid-text);
-      font-weight: 480;
-      display: flex;
-      gap: 12px;
-      align-items: center;
-      box-shadow: 0 6px 12px -6px rgba(209, 69, 69, 0.19);
-    }
-
-    /* generator section */
-    .generator-section {
-      margin-top: 2.2rem;
-      padding-top: 1.2rem;
-      border-top: 2px dashed var(--select-border);
-    }
-
-    .section-title {
-      font-weight: 600;
-      font-size: 1.2rem;
-      color: var(--accent-dark);
-      margin-bottom: 1.5rem;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .generator-grid {
-      display: flex;
-      flex-direction: column;
-      gap: 1.2rem;
-    }
-
-    .gen-row {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    .gen-label {
-      min-width: 100px;
-      font-weight: 550;
-      color: var(--accent-dark);
-    }
-
-    select, .gen-input {
-      background: var(--input-bg);
-      border: 2px solid var(--select-border);
-      padding: 0.8rem 1.2rem;
-      border-radius: 40px;
-      font-size: 0.95rem;
-      color: var(--text);
-      outline: none;
-      flex: 1 1 200px;
-    }
-
-    select:focus, .gen-input:focus {
-      border-color: var(--accent);
-    }
-
-    .gen-input {
-      font-family: 'SF Mono', monospace;
-    }
-
-    /* combobox/datalist */
-    .value-input-wrapper {
-      position: relative;
-      flex: 1 1 200px;
-    }
-
-    .value-input-wrapper input {
-      width: 100%;
-      padding: 0.8rem 1.2rem;
-      border: 2px solid var(--select-border);
-      border-radius: 40px;
-      font-size: 0.95rem;
-      font-family: 'SF Mono', monospace;
-      background: var(--input-bg);
-      color: var(--text);
-    }
-
-    .value-input-wrapper input:focus {
-      border-color: var(--accent);
-      outline: none;
-    }
-
-    .suggestions-dropdown {
-      position: absolute;
-      top: 100%;
-      left: 0;
-      right: 0;
-      background: var(--input-bg);
-      border: 2px solid var(--select-border);
-      border-top: none;
-      border-radius: 0 0 20px 20px;
-      max-height: 200px;
-      overflow-y: auto;
-      z-index: 1000;
-      display: none;
-      box-shadow: 0 10px 20px -10px rgba(0,0,0,0.2);
-    }
-
-    .suggestions-dropdown div {
-      padding: 0.8rem 1.2rem;
-      cursor: pointer;
-      font-family: 'SF Mono', monospace;
-      font-size: 0.9rem;
-      color: var(--text);
-      border-bottom: 1px solid var(--chip-bg2);
-    }
-
-    .suggestions-dropdown div:hover,
-    .suggestions-dropdown div.active {
-      background: var(--chip-bg2);
-    }
-
-    .suggestions-dropdown div:last-child {
-      border-bottom: none;
-    }
-
-    .tag-hint {
-      font-size: 0.85rem;
-      color: var(--text-soft);
-    }
-
-    .field-error {
-      font-size: 0.85rem;
-      color: var(--invalid-text);
-      display: none;
-    }
-
-    .field-error.visible {
-      display: block;
-    }
-
-    .generated-record-box {
-      background: var(--chip-bg);
-      border-radius: 40px;
-      padding: 1rem 1.8rem;
-      font-family: 'SF Mono', monospace;
-      font-size: 1rem;
-      color: var(--text);
-      word-break: break-all;
-      border: 2px solid var(--card-border);
-      margin: 0.5rem 0 1rem;
-    }
-
-    .action-buttons {
-      display: flex;
-      gap: 1rem;
-      flex-wrap: wrap;
-      margin-top: 0.5rem;
-    }
-
-    .secondary-btn {
-      background: var(--input-bg);
-      color: var(--accent-dark);
-      border: 2px solid var(--select-border);
-      box-shadow: 0 6px 12px -8px rgba(30, 58, 107, 0.44);
-    }
-
-    .secondary-btn:hover {
-      background: var(--chip-bg2);
-      border-color: var(--accent);
-    }
-
-    .note {
-      margin-top: 2rem;
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      display: flex;
-      justify-content: center;
-      gap: 2rem;
-      flex-wrap: wrap;
-      border-top: 1px solid var(--select-border);
-      padding-top: 1.5rem;
-    }
-
-    .note a {
-      color: var(--accent-dark);
-      font-weight: 550;
-      text-decoration: none;
-      border-bottom: 1px dotted;
-    }
-
-    .note a:hover { border-bottom: 2px solid; }
-
-    footer {
-      margin-top: 2.2rem;
-      text-align: center;
-      font-size: 0.9rem;
-      color: var(--text-muted);
-    }
-
-    footer a {
-      color: var(--text-muted);
-      text-decoration: underline;
-    }
-
-    footer a:hover {
-      color: var(--accent-dark);
-    }
-
-    @media (max-width: 480px) {
-      .glass-card { padding: 2rem 1.3rem; border-radius: 1.6rem; }
-    }
-  </style>
+  <link rel="preload" href="/fonts/big-shoulders-latin-wght.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/fonts/newsreader-latin-wght.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/site.css">
 </head>
+
 <body>
-<div class="glass-card">
-  <div class="top-bar">
-    <h1>
-      <span>🔍 CAA · inspect & build</span>
+<a class="skip" href="#domainInput">Skip to the tool</a>
+<header class="hero">
+  <div class="wrap">
+    <h1 class="display">
+      <span class="line"><span>CAA</span></span>
+      <span class="line"><span>inspect &amp; build</span></span>
     </h1>
-    <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode" title="Toggle dark mode">🌙</button>
+    <p class="lead">Check existing <strong>CAA records</strong> or generate new ones. Load existing to edit.</p>
   </div>
-  <div class="subhead">
-    Check existing <strong>CAA records</strong> or generate new ones — load existing to edit
-  </div>
+</header>
 
-  <main>
-  <h2 class="sr-only">Check a domain's CAA records</h2>
+<main>
+  <section class="block wrap" aria-labelledby="lookupTitle">
+    <h2 class="block-title" id="lookupTitle">Check a domain's CAA records</h2>
 
-  <!-- main input group -->
-  <div class="input-group">
-    <label for="domainInput">
-      <span>Domain name</span>
-      <i>example.com</i>
-    </label>
-    <div class="domain-input-wrapper">
-      <input type="text" id="domainInput" placeholder="e.g. example.com" value="example.com" spellcheck="false" autocomplete="off">
-      <button id="checkBtn">
-        <span id="btnText">Check CAA</span>
-        <span id="btnLoader" style="display: none;"></span>
-      </button>
-    </div>
-  </div>
-
-  <!-- dynamic result card (lookup) -->
-  <div class="result-area" id="resultContainer" aria-live="polite">
-    <!-- default info / placeholder (will be replaced by JS) -->
-    <div class="empty-state" id="placeholderState">
-      <span>📋</span>
-      <div>Enter a domain and click "Check CAA"<br> <span style="font-size:0.9rem;">CAA records show which CAs are allowed to issue certificates.</span></div>
+    <!-- main input group -->
+    <div class="field input-group">
+      <label for="domainInput">
+        <span>Domain name</span>
+        <i>example.com</i>
+      </label>
+      <div class="field-row domain-input-wrapper">
+        <input type="text" id="domainInput" placeholder="e.g. example.com" value="example.com" spellcheck="false" autocomplete="off">
+        <button class="btn" id="checkBtn">
+          <span id="btnText">Check CAA</span>
+          <span id="btnLoader" style="display: none;"></span>
+        </button>
+      </div>
     </div>
 
-    <!-- these sections are dynamically filled/ toggled by javascript -->
-    <div id="recordsContainer" style="display: none;"></div>
-    <div id="errorContainer" style="display: none;"></div>
-  </div>
+    <!-- dynamic result card (lookup) -->
+    <div class="result-area" id="resultContainer" aria-live="polite">
+      <!-- default info / placeholder (will be replaced by JS) -->
+      <div class="state empty empty-state" id="placeholderState">
+        <p>Enter a domain and click "Check CAA".<br>CAA records show which CAs are allowed to issue certificates.</p>
+      </div>
+
+      <!-- these sections are dynamically filled/ toggled by javascript -->
+      <div id="recordsContainer" style="display: none;"></div>
+      <div id="errorContainer" style="display: none;"></div>
+    </div>
+  </section>
 
   <!-- CAA GENERATOR SECTION (with load existing) -->
-  <div class="generator-section">
-    <h2 class="section-title">
-      <span>🛠️ CAA record generator</span>
-      <span style="font-size:0.85rem; background: var(--chip-bg); color: var(--chip-text); padding:0.2rem 1rem; border-radius:30px;">load & edit</span>
-    </h2>
-    <div class="generator-grid">
+  <section class="block wrap generator-section" aria-labelledby="genTitle">
+    <h2 class="block-title" id="genTitle">CAA record generator</h2>
+    <p class="block-note">Load and edit records from a lookup, or start from scratch.</p>
+    <div class="gen-grid">
       <!-- flag + tag + value -->
       <div class="gen-row">
         <label class="gen-label" for="genFlag">Flag</label>
@@ -756,7 +138,7 @@
           <option value="128">128 (non-critical)</option>
           <option value="255">255 (reserved)</option>
         </select>
-        <span class="tag-hint">usually 0</span>
+        <span class="hint">usually 0</span>
       </div>
       <div class="gen-row">
         <label class="gen-label" for="genTag">Tag</label>
@@ -766,46 +148,54 @@
           <option value="iodef">iodef</option>
         </select>
       </div>
-      <div class="gen-row">
+      <div class="gen-row v">
         <label class="gen-label" for="genValue">Value</label>
         <div class="value-input-wrapper">
           <input type="text" id="genValue" placeholder="Type or select a CA..." value="letsencrypt.org" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="suggestions" aria-autocomplete="list">
           <div id="suggestions" class="suggestions-dropdown" role="listbox" aria-label="Common certificate authorities"></div>
         </div>
-        <span class="tag-hint">common CAs shown</span>
+        <span class="hint">common CAs shown</span>
       </div>
       <div class="field-error" id="genValueError" role="alert">Please enter a value (e.g., ca.example.com)</div>
 
-      <div class="generated-record-box" id="generatedPreview">
-        0 issue "letsencrypt.org"
+      <div>
+        <div class="preview-label">Record preview</div>
+        <div class="preview generated-record-box" id="generatedPreview">
+          0 issue "letsencrypt.org"
+        </div>
       </div>
 
-      <div class="action-buttons">
-        <button id="addRecordBtn" class="secondary-btn" style="background: var(--chip-bg2); color: var(--accent-dark);">➕ Add to list</button>
-        <button id="loadExistingBtn" class="secondary-btn" style="background: var(--chip-bg);">📂 Load existing from lookup</button>
-        <button id="clearGenBtn" class="secondary-btn">🗑️ Reset</button>
+      <div class="actions action-buttons">
+        <button id="addRecordBtn" class="btn">Add to list</button>
+        <button id="loadExistingBtn" class="btn quiet">Load existing from lookup</button>
+        <button id="clearGenBtn" class="btn quiet">Reset</button>
       </div>
       <div class="field-error" id="loadExistingHint" role="status">No existing records loaded yet — run a lookup above first.</div>
 
       <!-- accumulated records for generation -->
-      <div style="margin-top: 0.8rem;">
-        <span style="font-weight:550; color: var(--accent-dark);">Records to publish: </span>
-        <span id="recordCount">0</span> (below)
+      <div>
+        <div class="pub-head">
+          <h3>Records to publish</h3>
+          <span><span id="recordCount">0</span> (below)</span>
+        </div>
+        <ul id="generatedList" class="gen-list">
+          <!-- dynamic list items will appear here -->
+        </ul>
       </div>
-      <ul id="generatedList" style="list-style:none; margin-top:0.8rem;">
-        <!-- dynamic list items will appear here -->
-      </ul>
-      <div style="display:flex; gap:1rem; flex-wrap:wrap; margin-top:1rem;">
-        <button id="generateBindText" style="background: var(--accent-solid);">📄 Show as BIND lines</button>
-        <button id="clearAllRecords" class="secondary-btn">🗑️ Clear all</button>
+      <div class="actions">
+        <button id="generateBindText" class="btn">Show as BIND lines</button>
+        <button id="clearAllRecords" class="btn quiet">Clear all</button>
       </div>
-      <div id="bindOutput" style="background: var(--chip-bg2); color: var(--text); border-radius:30px; padding:1rem 1.5rem; font-family: monospace; white-space:pre-wrap; margin-top:1rem; border:2px solid var(--card-border); display:none;" aria-live="polite"></div>
+      <div id="bindOutput" class="preview bind-output" aria-live="polite"></div>
     </div>
-  </div>
-  </main>
+  </section>
+</main>
 
+<div class="foot">
   <footer>
-    ⚡ using <strong>Google DNS over HTTPS</strong> · build CAA records ready for zone file · <a href="https://hbenali.ovh" target="_blank" rel="noopener noreferrer">hbenali.ovh</a>
+    <span>using <strong>Google DNS over HTTPS</strong></span>
+    <span>build CAA records ready for zone file</span>
+    <a href="https://hbenali.ovh" target="_blank" rel="noopener noreferrer">hbenali.ovh</a>
   </footer>
 </div>
 
@@ -837,41 +227,6 @@
     const generateBindText = document.getElementById('generateBindText');
     const clearAllRecords = document.getElementById('clearAllRecords');
     const bindOutput = document.getElementById('bindOutput');
-
-    // Theme
-    const themeToggle = document.getElementById('themeToggle');
-    const THEME_KEY = 'caaCheckerTheme';
-
-    function getStoredTheme() {
-      try { return localStorage.getItem(THEME_KEY); } catch (e) { return null; }
-    }
-
-    function effectiveTheme() {
-      const stored = getStoredTheme();
-      if (stored === 'light' || stored === 'dark') return stored;
-      return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-    }
-
-    function applyTheme() {
-      const stored = getStoredTheme();
-      if (stored === 'light' || stored === 'dark') {
-        document.documentElement.setAttribute('data-theme', stored);
-      } else {
-        document.documentElement.removeAttribute('data-theme');
-      }
-      if (themeToggle) themeToggle.textContent = effectiveTheme() === 'dark' ? '☀️' : '🌙';
-    }
-
-    if (themeToggle) {
-      themeToggle.addEventListener('click', () => {
-        const next = effectiveTheme() === 'dark' ? 'light' : 'dark';
-        try { localStorage.setItem(THEME_KEY, next); } catch (e) {}
-        applyTheme();
-      });
-    }
-
-    applyTheme();
-
     // Common CAA values for autocomplete
     const commonCAValues = [
       'letsencrypt.org',
@@ -991,16 +346,16 @@
     // render the list of generated records
     function renderGeneratedList() {
       if (generatedRecords.length === 0) {
-        generatedList.innerHTML = '<li style="background: var(--chip-bg2); border-radius:40px; padding:1rem; color: var(--text-soft);">➕ No CAA records added yet. Use the form above.</li>';
+        generatedList.innerHTML = '<li class="none">No CAA records added yet. Use the form above.</li>';
         recordCountSpan.textContent = '0';
         return;
       }
       let html = '';
       generatedRecords.forEach((rec, idx) => {
         const escaped = escapeHtml(rec);
-        html += `<li style="background: var(--input-bg); border-radius:40px; padding:0.8rem 1.5rem; margin-bottom:8px; display:flex; align-items:center; gap:10px; border-left:6px solid var(--record-border);">
-          <span style="flex:1; font-family:monospace; color: var(--text);">${escaped}</span>
-          <button class="remove-record" data-index="${idx}" style="background:transparent; border:none; font-size:1.3rem; cursor:pointer; color: var(--invalid-text); padding:0 6px; box-shadow:none;">&times;</button>
+        html += `<li>
+          <span>${escaped}</span>
+          <button class="remove-record" data-index="${idx}" aria-label="Remove record ${escaped}">&times;</button>
         </li>`;
       });
       generatedList.innerHTML = html;
@@ -1123,10 +478,9 @@
     function renderRecords(domain, records) {
       if (!records || records.length === 0) {
         recordsContainer.innerHTML = `
-          <div class="empty-state" style="background: var(--empty-bg);">
-            <span>🔓</span>
-            <div><strong style="font-size:1.2rem;">No CAA records found</strong></div>
-            <div style="margin-top:0.5rem;">Domain <code>${escapeHtml(domain)}</code> has no CAA policy.<br>Any CA may issue certificates.</div>
+          <div class="state warn">
+            <h2 class="state-title">No CAA records found</h2>
+            <p>Domain <code>${escapeHtml(domain)}</code> has no CAA policy.<br>Any CA may issue certificates.</p>
           </div>
         `;
         return;
@@ -1144,8 +498,8 @@
         if (parts) {
           itemsHtml += `
             <li class="record-item">
-              <span class="flag-tag">⚑ ${flagPart}</span>
-              <span class="flag-tag">🏷 ${tagPart}</span>
+              <span class="flag-tag"><span class="k">flag</span>${flagPart}</span>
+              <span class="flag-tag"><span class="k">tag</span>${tagPart}</span>
               <span class="record-value">${escapeHtml(valuePart)}</span>
             </li>
           `;
@@ -1154,20 +508,20 @@
         }
       }
       recordsContainer.innerHTML = `
-        <div class="result-header">
-          <h2>📌 CAA records for</h2>
+        <div class="state ok">
+          <h2 class="state-title">CAA records for</h2>
           <span class="badge-domain">${escapeHtml(domain)}</span>
         </div>
         <ul class="record-list">${itemsHtml}</ul>
-        <div style="margin-top: 0.8rem; font-size:0.9rem; color: var(--text-muted);">${records.length} record(s) found</div>
+        <div class="count">${records.length} record(s) found</div>
       `;
     }
 
     function renderError(domain, errorMessage) {
       errorContainer.innerHTML = `
-        <div class="error-message">
-          <span style="font-size:2rem;">⚠️</span>
-          <div style="flex:1;"><strong>Error checking ${escapeHtml(domain)}</strong><br>${escapeHtml(errorMessage)}</div>
+        <div class="state fail error-message" role="alert">
+          <h2 class="state-title">Error checking ${escapeHtml(domain)}</h2>
+          <p>${escapeHtml(errorMessage)}</p>
         </div>
       `;
     }

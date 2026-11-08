@@ -10,7 +10,7 @@ No backend, no build step, no dependencies — it's one static `index.html` call
 - **Generator** — build `issue` / `issuewild` / `iodef` records with autocomplete for common CAs
 - **Load existing** — pull records from a lookup straight into the generator to edit
 - **BIND output** — export the generated records as ready-to-paste zone file lines
-- **Dark mode** with persisted preference
+- **Dark editorial design**, fonts self-hosted
 - Fully responsive, accessible (labeled fields, WCAG AA contrast), and SEO-tagged (Open Graph, Twitter Card, JSON-LD)
 
 ## Running locally
