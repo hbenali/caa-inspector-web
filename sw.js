@@ -1,9 +1,10 @@
-const CACHE_NAME = 'caa-checker-v3';
+const CACHE_NAME = 'caa-checker-v4';
 const PRECACHE_URLS = [
   '/',
   '/index.html',
   '/404.html',
   '/site.css',
+  '/theme.js',
   '/fonts/big-shoulders-latin-wght.woff2',
   '/fonts/newsreader-latin-wght.woff2',
   '/fonts/newsreader-italic-latin-wght.woff2',
